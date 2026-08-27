@@ -27,7 +27,7 @@ adjuntos, importación/exportación masiva, API.
 | ID | Decisión | Resolución |
 |----|----------|------------|
 | D1 | Instalación de dependencias | Autorizada; se ejecuta al pasar Plan → Build |
-| D2 | Entorno | Recrear `.venv` con **Python 3.13**; **Django 5.2 LTS** |
+| D2 | Entorno | Recrear `.venv` con **Python 3.13.15** y **Django 5.2 LTS**, buscando paridad con el entorno de despliegue; el **Python 3.14.4 de Ubuntu permanece intacto** |
 | D3 | `on_delete` de `created_by`/`updated_by` | `PROTECT` |
 | D4 | Eliminación física | Bloqueada también fuera de la UI (nivel modelo) |
 | D5 | Grupo `tecnicos` | Migración de datos idempotente |

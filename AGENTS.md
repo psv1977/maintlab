@@ -4,6 +4,7 @@
 
 # Stack y restricciones
 - Backend: Python/Django con SQLite inicialmente y configuración en `maintlab/settings.py`. No cambiar de base de datos ni instalar dependencias sin autorización.
+- Versión objetivo de Python: 3.13.x, por compatibilidad con el entorno de despliegue (actualmente Python 3.13.15). No modificar ni sustituir el Python del sistema operativo.
 - `.venv/`, `.env`, `db.sqlite3` y `db.sqlite3-journal` son estado local ignorado; no modificarlos ni confirmarlos.
 - No alterar la arquitectura sin autorización.
 

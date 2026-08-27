@@ -19,12 +19,15 @@ Verificación base de cada tarea (desde la raíz del proyecto):
 ## Fase 1 — Infraestructura
 
 ### T01 — Entorno Python y dependencias
-- **Objetivo:** disponer del entorno de ejecución acordado: Python 3.13,
-  Django 5.2 LTS, `pytest` y `pytest-django` (D1/D2).
+- **Objetivo:** instalar y gestionar de forma aislada Python 3.13.15 para
+  recrear `.venv` con ese intérprete, junto con Django 5.2 LTS, `pytest` y
+  `pytest-django` (D1/D2), sin modificar ni sustituir el Python del sistema
+  operativo.
 - **Archivos afectados:** `.venv/` (estado local ignorado), `requirements.txt`.
 - **Depende de:** ninguna. Se ejecuta únicamente con la orden expresa
   Plan → Build.
-- **Criterio de finalización:** `python --version` reporta 3.13.x;
+- **Criterio de finalización:** `python --version` reporta 3.13.15 y `.venv`
+  fue recreado con ese intérprete;
   `django-admin --version` reporta 5.2.x; `pip check` sin conflictos;
   `requirements.txt` versionado con versiones fijadas; nada de `.venv/`
   en git.

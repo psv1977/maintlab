@@ -37,6 +37,9 @@ class Equipment(models.Model):
 
     class Meta:
         ordering = ["name"]
+        permissions = [
+            ("retire_equipment", "Can retire equipment"),
+        ]
 
     def __str__(self):
         return self.name

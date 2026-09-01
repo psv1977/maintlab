@@ -1,12 +1,21 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+from django.views.generic import DetailView, ListView
+
+from .models import Equipment
 
 
-def equipment_list(request):
-    return HttpResponse("Listado de equipos")
+class EquipmentListView(LoginRequiredMixin, ListView):
+    model = Equipment
+    template_name = "equipment/equipment_list.html"
+    context_object_name = "equipments"
+    paginate_by = 20
 
 
-def equipment_detail(request, pk):
-    return HttpResponse(f"Detalle del equipo {pk}")
+class EquipmentDetailView(LoginRequiredMixin, DetailView):
+    model = Equipment
+    template_name = "equipment/equipment_detail.html"
+    context_object_name = "equipment"
 
 
 def equipment_create(request):

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Equipos | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Equipos</h1>
+    {% if equipments %}
+      <ul>
+        {% for equipment in equipments %}
+          <li>
+            <a href="{% url 'equipment:detail' equipment.pk %}">{{ equipment.name }}</a>
+            <span>{{ equipment.code }}</span>
+            <span>{{ equipment.get_status_display }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay equipos registrados.</p>
+    {% endif %}
+
+    {% if is_paginated %}
+      <nav aria-label="Paginación">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </main>
+{% endblock %}

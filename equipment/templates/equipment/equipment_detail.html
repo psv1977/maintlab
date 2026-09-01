@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ equipment.name }} | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>{{ equipment.name }}</h1>
+    <dl>
+      <dt>Código</dt>
+      <dd>{{ equipment.code }}</dd>
+      <dt>Descripción</dt>
+      <dd>{{ equipment.description|default:"Sin descripción" }}</dd>
+      <dt>Número de serie</dt>
+      <dd>{{ equipment.serial_number|default:"Sin número de serie" }}</dd>
+      <dt>Estado</dt>
+      <dd>{{ equipment.get_status_display }}</dd>
+      <dt>Creado por</dt>
+      <dd>{{ equipment.created_by }}</dd>
+      <dt>Fecha de creación</dt>
+      <dd>{{ equipment.created_at }}</dd>
+    </dl>
+    <a href="{% url 'equipment:list' %}">Volver al listado</a>
+  </main>
+{% endblock %}

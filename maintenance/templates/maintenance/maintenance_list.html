@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Mantenimientos | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Mantenimientos</h1>
+    <p><a href="{% url 'maintenance:create' %}">Nuevo mantenimiento</a></p>
+    <form method="get">
+      <label for="search">Buscar</label>
+      <input id="search" type="search" name="q" value="{{ request.GET.q }}">
+      <label for="type">Tipo</label>
+      <select id="type" name="type">
+        <option value="">Todos los tipos</option>
+        {% for value, label in maintenance_type_choices %}
+          <option value="{{ value }}"{% if request.GET.type == value %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <label for="status">Estado</label>
+      <select id="status" name="status">
+        <option value="">Todos los estados</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}"{% if request.GET.status == value %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Buscar</button>
+    </form>
+    {% if maintenance_records %}
+      <ul>
+        {% for record in maintenance_records %}
+          <li>
+            <a href="{% url 'maintenance:detail' record.pk %}">{{ record.equipment.name }}</a>
+            <span>{{ record.get_maintenance_type_display }}</span>
+            <span>{{ record.get_status_display }}</span>
+            <span>{{ record.performed_at|date:"d/m/Y H:i" }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay registros de mantenimiento.</p>
+    {% endif %}
+
+    {% if is_paginated %}
+      <nav aria-label="Paginación">
+        {% if page_obj.has_previous %}
+          <a href="?{% if query_params %}{{ query_params }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?{% if query_params %}{{ query_params }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </main>
+{% endblock %}

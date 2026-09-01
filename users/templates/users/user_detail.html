@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user_obj.username }} | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>{{ user_obj.username }}</h1>
+    <dl>
+      <dt>Nombre completo</dt>
+      <dd>{{ user_obj.get_full_name|default:"Sin nombre" }}</dd>
+      <dt>Email</dt>
+      <dd>{{ user_obj.email|default:"Sin email" }}</dd>
+      <dt>Activo</dt>
+      <dd>{% if user_obj.is_active %}Sí{% else %}No{% endif %}</dd>
+      <dt>Staff</dt>
+      <dd>{% if user_obj.is_staff %}Sí{% else %}No{% endif %}</dd>
+      <dt>Superusuario</dt>
+      <dd>{% if user_obj.is_superuser %}Sí{% else %}No{% endif %}</dd>
+      <dt>Grupos</dt>
+      <dd>
+        {% for group in user_obj.groups.all %}
+          {{ group.name }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+          Sin grupos
+        {% endfor %}
+      </dd>
+    </dl>
+    <p><a href="{% url 'users:update' user_obj.pk %}">Editar</a></p>
+    <p><a href="{% url 'users:groups' user_obj.pk %}">Gestionar grupos</a></p>
+    <p><a href="{% url 'users:list' %}">Volver al listado</a></p>
+  </main>
+{% endblock %}

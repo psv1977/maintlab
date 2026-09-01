@@ -26,6 +26,7 @@
       {% endif %}
     </dl>
     <a href="{% url 'equipment:update' equipment.pk %}">Editar</a>
+    <a href="{% url 'maintenance:history' equipment.pk %}">Historial de mantenimiento</a>
     {% if perms.equipment.retire_equipment %}
       <a href="{% url 'equipment:retire' equipment.pk %}">Retirar</a>
     {% endif %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de {{ equipment.name }} | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Historial de mantenimiento: {{ equipment.name }}</h1>
+    <p><strong>Código:</strong> {{ equipment.code }}</p>
+    <p><a href="{% url 'equipment:detail' equipment.pk %}">Ver equipo</a></p>
+    {% if maintenance_records %}
+      <ul>
+        {% for record in maintenance_records %}
+          <li>
+            <a href="{% url 'maintenance:detail' record.pk %}">{{ record.get_maintenance_type_display }}</a>
+            <span>{{ record.get_status_display }}</span>
+            <span>{{ record.performed_at|date:"d/m/Y H:i" }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay registros de mantenimiento para este equipo.</p>
+    {% endif %}
+
+    {% if is_paginated %}
+      <nav aria-label="Paginación">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </main>
+{% endblock %}

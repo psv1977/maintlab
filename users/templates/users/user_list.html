@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Usuarios | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Usuarios</h1>
+    <p><a href="{% url 'users:create' %}">Nuevo usuario</a></p>
+    {% if users %}
+      <ul>
+        {% for u in users %}
+          <li>
+            <a href="{% url 'users:detail' u.pk %}">{{ u.username }}</a>
+            <span>{{ u.get_full_name|default:"Sin nombre" }}</span>
+            <span>{{ u.email|default:"Sin email" }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay usuarios registrados.</p>
+    {% endif %}
+
+    {% if is_paginated %}
+      <nav aria-label="Paginación">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </main>
+{% endblock %}

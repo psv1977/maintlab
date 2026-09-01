@@ -9,6 +9,10 @@
   <header>
     <nav aria-label="Navegación principal">
       <a href="{% url 'equipment:list' %}">Equipos</a>
+      <a href="{% url 'maintenance:list' %}">Mantenimientos</a>
+      {% if user.is_staff %}
+        <a href="{% url 'users:list' %}">Usuarios</a>
+      {% endif %}
       {% if user.is_authenticated %}
         <span>Sesión: {{ user.username }}</span>
         <form method="post" action="{% url 'logout' %}" style="display:inline">

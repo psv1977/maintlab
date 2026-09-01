@@ -16,6 +16,9 @@ def test_tecnicos_group_exists_with_exact_permissions(tecnicos_group):
         "add_equipment",
         "view_equipment",
         "change_equipment",
+        "add_maintenance",
+        "view_maintenance",
+        "change_maintenance",
     }
 
 
@@ -29,6 +32,9 @@ def test_tecnicos_member_has_operational_permissions_only(tecnicos_group):
     assert user.has_perm("equipment.change_equipment")
     assert not user.has_perm("equipment.delete_equipment")
     assert not user.has_perm("equipment.retire_equipment")
+    assert user.has_perm("maintenance.add_maintenance")
+    assert user.has_perm("maintenance.view_maintenance")
+    assert user.has_perm("maintenance.change_maintenance")
 
 
 @pytest.mark.django_db

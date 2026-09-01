@@ -5,6 +5,7 @@
 {% block content %}
   <main>
     <h1>Equipos</h1>
+    <p><a href="{% url 'equipment:create' %}">Nuevo equipo</a></p>
     <form method="get">
       <label for="search">Buscar</label>
       <input id="search" type="search" name="q" value="{{ request.GET.q }}">

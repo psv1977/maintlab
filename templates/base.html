@@ -11,13 +11,19 @@
       <a href="{% url 'equipment:list' %}">Equipos</a>
       {% if user.is_authenticated %}
         <span>Sesión: {{ user.username }}</span>
+        <form method="post" action="{% url 'logout' %}" style="display:inline">
+          {% csrf_token %}
+          <button type="submit">Cerrar sesión</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Iniciar sesión</a>
       {% endif %}
     </nav>
   </header>
   {% if messages %}
     <ul aria-label="Mensajes">
       {% for message in messages %}
-        <li>{{ message }}</li>
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
       {% endfor %}
     </ul>
   {% endif %}

@@ -18,6 +18,12 @@
       <dd>{{ equipment.created_by }}</dd>
       <dt>Fecha de creación</dt>
       <dd>{{ equipment.created_at }}</dd>
+      {% if equipment.updated_by %}
+        <dt>Modificado por</dt>
+        <dd>{{ equipment.updated_by }}</dd>
+        <dt>Fecha de modificación</dt>
+        <dd>{{ equipment.updated_at }}</dd>
+      {% endif %}
     </dl>
     <a href="{% url 'equipment:update' equipment.pk %}">Editar</a>
     {% if perms.equipment.retire_equipment %}

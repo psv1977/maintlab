@@ -13,6 +13,12 @@
             <a href="{% url 'users:detail' u.pk %}">{{ u.username }}</a>
             <span>{{ u.get_full_name|default:"Sin nombre" }}</span>
             <span>{{ u.email|default:"Sin email" }}</span>
+            <span>
+              Roles:
+              {% for group in u.groups.all %}{{ group.name }}{% if not forloop.last %}, {% endif %}{% empty %}Sin roles{% endfor %}
+            </span>
+            <span>{% if u.is_active %}Activo{% else %}Inactivo{% endif %}</span>
+            <span>{% if u.is_staff %}Staff{% else %}Sin acceso administrativo{% endif %}</span>
           </li>
         {% endfor %}
       </ul>

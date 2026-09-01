@@ -28,7 +28,8 @@
     {% if maintenance_records %}
       <ul>
         {% for record in maintenance_records %}
-          <li>
+            <li>
+            <span>{{ record.work_order.number|default:"Sin OT" }}</span>
             <a href="{% url 'maintenance:detail' record.pk %}">{{ record.equipment.name }}</a>
             <span>{{ record.get_maintenance_type_display }}</span>
             <span>{{ record.get_status_display }}</span>

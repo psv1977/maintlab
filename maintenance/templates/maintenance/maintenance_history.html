@@ -12,8 +12,12 @@
         {% for record in maintenance_records %}
           <li>
             <a href="{% url 'maintenance:detail' record.pk %}">{{ record.get_maintenance_type_display }}</a>
+            <span>{{ record.work_order.number|default:"Sin OT" }}</span>
             <span>{{ record.get_status_display }}</span>
             <span>{{ record.performed_at|date:"d/m/Y H:i" }}</span>
+            {% if record.completed_at %}
+              <span>Término: {{ record.completed_at|date:"d/m/Y H:i" }}</span>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>

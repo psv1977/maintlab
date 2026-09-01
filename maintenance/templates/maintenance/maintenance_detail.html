@@ -5,12 +5,19 @@
 {% block content %}
   <main>
     <h1>{{ maintenance_record.equipment.name }}</h1>
+    <p><strong>Orden de trabajo:</strong> {{ maintenance_record.work_order.number|default:"Sin OT" }}</p>
+    {% if maintenance_record.work_order %}
+      <p><strong>RUT del cliente:</strong> {{ maintenance_record.work_order.client_rut }}</p>
+    {% endif %}
     <p><strong>Código:</strong> {{ maintenance_record.equipment.code }}</p>
     <p><strong>Tipo:</strong> {{ maintenance_record.get_maintenance_type_display }}</p>
     <p><strong>Descripción:</strong> {{ maintenance_record.description }}</p>
     <p><strong>Estado:</strong> {{ maintenance_record.get_status_display }}</p>
     <p><strong>Realizado por:</strong> {{ maintenance_record.performed_by.username }}</p>
     <p><strong>Fecha de realización:</strong> {{ maintenance_record.performed_at|date:"d/m/Y H:i" }}</p>
+    {% if maintenance_record.completed_at %}
+      <p><strong>Fecha de término:</strong> {{ maintenance_record.completed_at|date:"d/m/Y H:i" }}</p>
+    {% endif %}
     {% if maintenance_record.next_maintenance %}
       <p><strong>Próximo mantenimiento:</strong> {{ maintenance_record.next_maintenance|date:"d/m/Y H:i" }}</p>
     {% endif %}

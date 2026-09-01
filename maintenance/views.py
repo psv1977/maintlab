@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -9,7 +10,19 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from equipment.models import Equipment
 
 from .forms import MaintenanceForm
-from .models import MaintenanceRecord
+from .models import DocumentSequence, MaintenanceRecord, WorkOrder
+
+
+def allocate_work_order_number():
+    sequence, _ = DocumentSequence.objects.get_or_create(
+        document_type="work_order",
+        defaults={"next_number": 1},
+    )
+    sequence = DocumentSequence.objects.select_for_update().get(pk=sequence.pk)
+    number = f"OT-{sequence.next_number:04d}"
+    sequence.next_number += 1
+    sequence.save(update_fields=["next_number", "updated_at"])
+    return number
 
 
 class MaintenanceListView(LoginRequiredMixin, ListView):
@@ -19,13 +32,17 @@ class MaintenanceListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related("equipment", "performed_by")
+        queryset = super().get_queryset().select_related(
+            "equipment", "performed_by", "work_order"
+        )
         query = self.request.GET.get("q", "").strip()
         if query:
             queryset = queryset.filter(
                 Q(description__icontains=query)
                 | Q(equipment__name__icontains=query)
                 | Q(equipment__code__icontains=query)
+                | Q(work_order__number__icontains=query)
+                | Q(work_order__client_rut__icontains=query)
             )
 
         maintenance_type = self.request.GET.get("type")
@@ -62,9 +79,20 @@ class MaintenanceCreateView(LoginRequiredMixin, CreateView):
     template_name = "maintenance/maintenance_form.html"
 
     def form_valid(self, form):
-        form.instance.created_by = self.request.user
-        form.instance.performed_by = self.request.user
-        return super().form_valid(form)
+        with transaction.atomic():
+            form.instance.created_by = self.request.user
+            form.instance.performed_by = (
+                form.cleaned_data["performed_by"] or self.request.user
+            )
+            work_order = WorkOrder.objects.create(
+                number=allocate_work_order_number(),
+                client_rut=form.cleaned_data["client_rut"],
+                equipment=form.cleaned_data["equipment"],
+                created_by=self.request.user,
+            )
+            form.instance.work_order = work_order
+            response = super().form_valid(form)
+        return response
 
     def get_success_url(self):
         return reverse("maintenance:list")
@@ -76,6 +104,12 @@ class MaintenanceUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "maintenance/maintenance_form.html"
 
     def form_valid(self, form):
+        form.instance.performed_by = (
+            form.cleaned_data["performed_by"] or self.request.user
+        )
+        if form.instance.work_order_id:
+            form.instance.work_order.client_rut = form.cleaned_data["client_rut"]
+            form.instance.work_order.save(update_fields=["client_rut"])
         form.instance.updated_by = self.request.user
         form.instance.updated_at = timezone.now()
         return super().form_valid(form)
@@ -93,7 +127,7 @@ class MaintenanceHistoryView(LoginRequiredMixin, ListView):
         self.equipment = get_object_or_404(Equipment, pk=self.kwargs["equipment_id"])
         return MaintenanceRecord.objects.filter(
             equipment=self.equipment
-        ).select_related("performed_by")
+        ).select_related("performed_by", "work_order")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

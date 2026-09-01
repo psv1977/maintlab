@@ -12,6 +12,16 @@
       <dd>{{ equipment.description|default:"Sin descripción" }}</dd>
       <dt>Número de serie</dt>
       <dd>{{ equipment.serial_number|default:"Sin número de serie" }}</dd>
+      <dt>Marca</dt>
+      <dd>{{ equipment.brand|default:"Sin marca" }}</dd>
+      <dt>Modelo</dt>
+      <dd>{{ equipment.model|default:"Sin modelo" }}</dd>
+      <dt>Ubicación</dt>
+      <dd>{{ equipment.location|default:"Sin ubicación" }}</dd>
+      <dt>Fecha de puesta en servicio</dt>
+      <dd>{{ equipment.commissioned_at|date:"d/m/Y"|default:"Sin fecha" }}</dd>
+      <dt>Aplicación</dt>
+      <dd>{{ equipment.application|default:"Sin aplicación" }}</dd>
       <dt>Estado</dt>
       <dd>{{ equipment.get_status_display }}</dd>
       <dt>Creado por</dt>

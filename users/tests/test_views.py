@@ -88,6 +88,22 @@ def test_user_create_view_post_valid(client, staff_user):
 
 
 @pytest.mark.django_db
+def test_staff_user_cannot_assign_staff_on_creation(client, staff_user):
+    client.force_login(staff_user)
+    data = {
+        "username": "newuser",
+        "password1": "testpass123!",
+        "password2": "testpass123!",
+        "is_staff": True,
+    }
+
+    response = client.post(reverse("users:create"), data)
+
+    assert response.status_code == 302
+    assert not User.objects.get(username="newuser").is_staff
+
+
+@pytest.mark.django_db
 def test_user_update_requires_staff(client, regular_user):
     client.force_login(regular_user)
     response = client.get(reverse("users:update", args=[regular_user.pk]))

@@ -11,8 +11,26 @@ class EquipmentForm(forms.ModelForm):
             "code",
             "description",
             "serial_number",
+            "brand",
+            "model",
+            "location",
+            "commissioned_at",
+            "application",
             "status",
         ]
+        labels = {
+            "name": "Nombre",
+            "code": "Código",
+            "description": "Descripción",
+            "serial_number": "Número de serie",
+            "brand": "Marca",
+            "model": "Modelo",
+            "location": "Ubicación",
+            "commissioned_at": "Fecha de puesta en servicio",
+            "application": "Aplicación",
+            "status": "Estado",
+        }
+        widgets = {"commissioned_at": forms.DateInput(attrs={"type": "date"})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

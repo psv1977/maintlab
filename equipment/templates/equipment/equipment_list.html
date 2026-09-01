@@ -5,6 +5,18 @@
 {% block content %}
   <main>
     <h1>Equipos</h1>
+    <form method="get">
+      <label for="search">Buscar</label>
+      <input id="search" type="search" name="q" value="{{ request.GET.q }}">
+      <label for="status">Estado</label>
+      <select id="status" name="status">
+        <option value="">Todos los estados</option>
+        {% for value, label in status_choices %}
+          <option value="{{ value }}"{% if request.GET.status == value %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Buscar</button>
+    </form>
     {% if equipments %}
       <ul>
         {% for equipment in equipments %}
@@ -22,11 +34,11 @@
     {% if is_paginated %}
       <nav aria-label="Paginación">
         {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+          <a href="?{% if query_params %}{{ query_params }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Anterior</a>
         {% endif %}
         <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+          <a href="?{% if query_params %}{{ query_params }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Siguiente</a>
         {% endif %}
       </nav>
     {% endif %}

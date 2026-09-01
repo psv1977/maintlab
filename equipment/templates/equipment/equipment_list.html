@@ -25,6 +25,7 @@
             <a href="{% url 'equipment:detail' equipment.pk %}">{{ equipment.name }}</a>
             <span>{{ equipment.code }}</span>
             <span>{{ equipment.get_status_display }}</span>
+            <a href="{% url 'equipment:update' equipment.pk %}">Editar</a>
           </li>
         {% endfor %}
       </ul>

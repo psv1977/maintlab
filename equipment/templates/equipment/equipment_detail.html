@@ -19,6 +19,7 @@
       <dt>Fecha de creación</dt>
       <dd>{{ equipment.created_at }}</dd>
     </dl>
+    <a href="{% url 'equipment:update' equipment.pk %}">Editar</a>
     <a href="{% url 'equipment:list' %}">Volver al listado</a>
   </main>
 {% endblock %}

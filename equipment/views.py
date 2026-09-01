@@ -1,7 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.urls import reverse
-from django.views.generic import CreateView, DetailView, ListView
+from django.utils import timezone
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import EquipmentForm
 from .models import Equipment
@@ -59,8 +60,21 @@ class EquipmentCreateView(LoginRequiredMixin, CreateView):
         return reverse("equipment:list")
 
 
-def equipment_update(request, pk):
-    return HttpResponse(f"Editar equipo {pk}")
+class EquipmentUpdateView(LoginRequiredMixin, UpdateView):
+    model = Equipment
+    form_class = EquipmentForm
+    template_name = "equipment/equipment_form.html"
+
+    def form_valid(self, form):
+        if form.instance.status == Equipment.Status.RETIRED:
+            form.add_error("status", "No puede asignar el estado Retirado.")
+            return self.form_invalid(form)
+        form.instance.updated_by = self.request.user
+        form.instance.updated_at = timezone.now()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("equipment:detail", args=[self.object.pk])
 
 
 def equipment_retire(request, pk):

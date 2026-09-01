@@ -20,6 +20,9 @@
       <dd>{{ equipment.created_at }}</dd>
     </dl>
     <a href="{% url 'equipment:update' equipment.pk %}">Editar</a>
+    {% if perms.equipment.retire_equipment %}
+      <a href="{% url 'equipment:retire' equipment.pk %}">Retirar</a>
+    {% endif %}
     <a href="{% url 'equipment:list' %}">Volver al listado</a>
   </main>
 {% endblock %}

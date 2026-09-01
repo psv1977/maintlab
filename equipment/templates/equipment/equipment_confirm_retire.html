@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Retirar {{ equipment.name }} | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Retirar equipo</h1>
+    <p>¿Está seguro de que desea retirar el equipo <strong>{{ equipment.name }}</strong> ({{ equipment.code }})?</p>
+    <p>Esta acción cambiará el estado del equipo a <strong>Retirado</strong>.</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit">Confirmar retiro</button>
+      <a href="{% url 'equipment:detail' equipment.pk %}">Cancelar</a>
+    </form>
+  </main>
+{% endblock %}

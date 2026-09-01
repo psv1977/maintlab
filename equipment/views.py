@@ -1,7 +1,9 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import EquipmentForm
@@ -77,5 +79,16 @@ class EquipmentUpdateView(LoginRequiredMixin, UpdateView):
         return reverse("equipment:detail", args=[self.object.pk])
 
 
-def equipment_retire(request, pk):
-    return HttpResponse(f"Retirar equipo {pk}")
+class EquipmentRetireView(PermissionRequiredMixin, View):
+    permission_required = "equipment.retire_equipment"
+    template_name = "equipment/equipment_confirm_retire.html"
+
+    def get(self, request, pk):
+        equipment = get_object_or_404(Equipment, pk=pk)
+        return render(request, self.template_name, {"equipment": equipment})
+
+    def post(self, request, pk):
+        equipment = get_object_or_404(Equipment, pk=pk)
+        equipment.status = Equipment.Status.RETIRED
+        equipment.save(update_fields=["status"])
+        return redirect(reverse("equipment:detail", args=[equipment.pk]))

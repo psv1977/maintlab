@@ -26,6 +26,9 @@
             <span>{{ equipment.code }}</span>
             <span>{{ equipment.get_status_display }}</span>
             <a href="{% url 'equipment:update' equipment.pk %}">Editar</a>
+            {% if perms.equipment.retire_equipment %}
+              <a href="{% url 'equipment:retire' equipment.pk %}">Retirar</a>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>

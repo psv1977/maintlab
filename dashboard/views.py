@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 
 from equipment.models import Equipment
 from maintenance.models import MaintenanceRecord, WorkOrder
+from organizations.tenant import get_user_organization
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -14,13 +15,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         now = timezone.now()
+        organization = get_user_organization(self.request.user)
 
         # Equipos por estado
         equipment_counts = {}
         for value, label in Equipment.Status.choices:
             equipment_counts[value] = {
                 "label": label,
-                "count": Equipment.objects.filter(status=value).count(),
+                "count": Equipment.objects.filter(organization=organization, status=value).count(),
             }
         context["equipment_by_status"] = equipment_counts
 
@@ -29,28 +31,29 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         for value, label in MaintenanceRecord.Status.choices:
             maintenance_counts[value] = {
                 "label": label,
-                "count": MaintenanceRecord.objects.filter(status=value).count(),
+                "count": MaintenanceRecord.objects.filter(organization=organization, status=value).count(),
             }
         context["maintenance_by_status"] = maintenance_counts
 
         # Órdenes de trabajo
-        context["total_work_orders"] = WorkOrder.objects.count()
+        context["total_work_orders"] = WorkOrder.objects.filter(organization=organization).count()
 
         # Últimos 5 equipos
         context["recent_equipments"] = (
-            Equipment.objects.select_related("location")
+            Equipment.objects.filter(organization=organization).select_related("location")
             .order_by("-created_at")[:5]
         )
 
         # Últimos 5 mantenimientos
         context["recent_maintenances"] = (
-            MaintenanceRecord.objects.select_related("equipment", "performed_by")
+            MaintenanceRecord.objects.filter(organization=organization).select_related("equipment", "performed_by")
             .order_by("-performed_at")[:5]
         )
 
         # Próximos mantenimientos (próximos 30 días)
         context["upcoming_maintenances"] = (
             MaintenanceRecord.objects.filter(
+                organization=organization,
                 next_maintenance__gte=now,
                 next_maintenance__lte=now + timezone.timedelta(days=30),
             )

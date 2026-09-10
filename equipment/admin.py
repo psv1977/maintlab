@@ -1,10 +1,11 @@
 from django.contrib import admin
 
 from .models import Equipment, Location
+from organizations.admin import OrganizationScopedAdmin
 
 
 @admin.register(Location)
-class LocationAdmin(admin.ModelAdmin):
+class LocationAdmin(OrganizationScopedAdmin):
     list_display = ["name", "description"]
     search_fields = ["name"]
 
@@ -13,7 +14,7 @@ class LocationAdmin(admin.ModelAdmin):
 
 
 @admin.register(Equipment)
-class EquipmentAdmin(admin.ModelAdmin):
+class EquipmentAdmin(OrganizationScopedAdmin):
     list_display = [
         "name",
         "code",

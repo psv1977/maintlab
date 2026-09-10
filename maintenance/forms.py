@@ -49,11 +49,13 @@ class MaintenanceForm(forms.ModelForm):
         required=False,
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, organization=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["equipment"].queryset = Equipment.objects.exclude(
             status=Equipment.Status.RETIRED
         )
+        if organization:
+            self.fields["equipment"].queryset = self.fields["equipment"].queryset.filter(organization=organization)
         self.fields["performed_by"].queryset = User.objects.filter(is_active=True)
         if self.instance.pk and self.instance.work_order_id:
             self.initial["client_rut"] = self.instance.work_order.client_rut

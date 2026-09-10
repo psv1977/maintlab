@@ -1,10 +1,11 @@
 from django.contrib import admin
 
-from .models import DocumentSequence, MaintenanceRecord, WorkOrder
+from .models import MaintenanceRecord, WorkOrder
+from organizations.admin import OrganizationScopedAdmin
 
 
 @admin.register(WorkOrder)
-class WorkOrderAdmin(admin.ModelAdmin):
+class WorkOrderAdmin(OrganizationScopedAdmin):
     list_display = ["number", "client_rut", "equipment", "created_by", "created_at"]
     search_fields = ["number", "client_rut", "equipment__name", "equipment__code"]
     readonly_fields = ["number", "created_by", "created_at"]
@@ -13,13 +14,8 @@ class WorkOrderAdmin(admin.ModelAdmin):
         return False
 
 
-@admin.register(DocumentSequence)
-class DocumentSequenceAdmin(admin.ModelAdmin):
-    list_display = ["document_type", "next_number", "updated_at"]
-
-
 @admin.register(MaintenanceRecord)
-class MaintenanceRecordAdmin(admin.ModelAdmin):
+class MaintenanceRecordAdmin(OrganizationScopedAdmin):
     list_display = [
         "work_order",
         "equipment",

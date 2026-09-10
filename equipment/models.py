@@ -1,13 +1,17 @@
 from django.conf import settings
 from django.db import models
 
+from organizations.models import Organization, default_organization
+
 
 class Location(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, related_name="locations", default=default_organization)
+    name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
 
     class Meta:
         ordering = ["name"]
+        constraints = [models.UniqueConstraint(fields=["organization", "name"], name="unique_location_name_per_organization")]
         verbose_name = "ubicación"
         verbose_name_plural = "ubicaciones"
 
@@ -23,8 +27,9 @@ class Equipment(models.Model):
         OUT_OF_SERVICE = "out_of_service", "Fuera de servicio"
         RETIRED = "retired", "Retirado"
 
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, related_name="equipments", default=default_organization)
     name = models.CharField(max_length=200)
-    code = models.CharField(max_length=50, unique=True)
+    code = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     serial_number = models.CharField(max_length=100, blank=True)
     brand = models.CharField(max_length=100, blank=True)
@@ -61,6 +66,7 @@ class Equipment(models.Model):
 
     class Meta:
         ordering = ["name"]
+        constraints = [models.UniqueConstraint(fields=["organization", "code"], name="unique_equipment_code_per_organization")]
         permissions = [
             ("retire_equipment", "Can retire equipment"),
         ]

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Invitaciones | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Invitaciones</h1>
+    <form method="post" action="{% url 'users:invitation-create' %}">
+      {% csrf_token %}
+      <button type="submit">Generar invitación</button>
+    </form>
+    {% if invitations %}
+      <ul>
+        {% for invitation in invitations %}
+          <li>
+            <code>{{ invitation.code }}</code> · vence {{ invitation.expires_at|date:"d/m/Y H:i" }} ·
+            {% if invitation.used_at %}usada por {{ invitation.used_by.username }}{% elif invitation.revoked_at %}revocada{% elif invitation.is_available %}vigente<form method="post" action="{% url 'users:invitation-revoke' invitation.pk %}">{% csrf_token %}<button type="submit">Revocar</button></form>{% else %}vencida{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay invitaciones generadas.</p>
+    {% endif %}
+  </main>
+{% endblock %}

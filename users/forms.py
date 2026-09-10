@@ -2,6 +2,9 @@ from django import forms
 from django.contrib.auth.forms import SetPasswordForm, UserCreationForm
 from django.contrib.auth.models import User
 
+from maintenance.rut import normalize_rut
+from organizations.models import Organization, OrganizationInvitation
+
 
 class UserForm(forms.ModelForm):
     def __init__(self, *args, can_manage_staff=True, **kwargs):
@@ -79,3 +82,55 @@ class UserPasswordForm(SetPasswordForm):
         label="Confirmar nueva contraseña",
         widget=forms.PasswordInput,
     )
+
+
+class OrganizationRutForm(forms.Form):
+    rut = forms.CharField(
+        label="RUT de la empresa",
+        widget=forms.TextInput(attrs={"data-rut": "true", "autocomplete": "off"}),
+    )
+
+    def clean_rut(self):
+        return normalize_rut(self.cleaned_data["rut"])
+
+
+class OrganizationRegistrationForm(forms.ModelForm):
+    class Meta:
+        model = Organization
+        fields = ["name", "rut", "business_line", "address"]
+        labels = {
+            "name": "Razón social",
+            "rut": "RUT de la empresa",
+            "business_line": "Giro",
+            "address": "Dirección",
+        }
+        widgets = {"rut": forms.TextInput(attrs={"data-rut": "true", "autocomplete": "off"})}
+
+    def clean_rut(self):
+        return normalize_rut(self.cleaned_data["rut"])
+
+
+class PublicUserRegistrationForm(UserCreationForm):
+    invitation_code = forms.CharField(label="Código de invitación", required=False)
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ["username", "first_name", "last_name", "email"]
+
+    def __init__(self, *args, organization=None, requires_invitation=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.organization = organization
+        self.requires_invitation = requires_invitation
+        self.fields["username"].label = "Nombre de usuario"
+        self.fields["first_name"].label = "Nombre"
+        self.fields["last_name"].label = "Apellido"
+        self.fields["email"].label = "Correo electrónico"
+        self.fields["invitation_code"].required = requires_invitation
+        if not requires_invitation:
+            self.fields.pop("invitation_code")
+
+    def clean_invitation_code(self):
+        code = self.cleaned_data["invitation_code"].strip()
+        if not OrganizationInvitation.objects.filter(organization=self.organization, code=code).exists():
+            raise forms.ValidationError("El código de invitación no es válido para esta empresa.")
+        return code

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar empresa | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Registrar empresa</h1>
+    <p>Esta empresa aún no está registrada. Complete sus datos para crearla.</p>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Crear empresa</button>
+    </form>
+  </main>
+{% endblock %}

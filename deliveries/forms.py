@@ -41,12 +41,15 @@ class DeliveryForm(forms.ModelForm):
             "returned_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, organization=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["equipment"].queryset = Equipment.objects.exclude(
             status=Equipment.Status.RETIRED
         )
         self.fields["work_order"].queryset = WorkOrder.objects.select_related("equipment")
+        if organization:
+            self.fields["equipment"].queryset = self.fields["equipment"].queryset.filter(organization=organization)
+            self.fields["work_order"].queryset = self.fields["work_order"].queryset.filter(organization=organization)
         self.fields["delivered_by"].queryset = User.objects.filter(is_active=True)
 
     def clean_client_rut(self):

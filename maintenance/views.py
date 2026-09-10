@@ -11,6 +11,7 @@ from equipment.models import Equipment
 
 from .forms import MaintenanceForm
 from .models import DocumentSequence, MaintenanceRecord, WorkOrder
+from organizations.tenant import get_user_organization
 
 
 def allocate_work_order_number():
@@ -32,7 +33,7 @@ class MaintenanceListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related(
+        queryset = super().get_queryset().filter(organization=get_user_organization(self.request.user)).select_related(
             "equipment", "performed_by", "work_order"
         )
         query = self.request.GET.get("q", "").strip()
@@ -72,20 +73,30 @@ class MaintenanceDetailView(LoginRequiredMixin, DetailView):
     template_name = "maintenance/maintenance_detail.html"
     context_object_name = "maintenance_record"
 
+    def get_queryset(self):
+        return super().get_queryset().filter(organization=get_user_organization(self.request.user))
+
 
 class MaintenanceCreateView(LoginRequiredMixin, CreateView):
     model = MaintenanceRecord
     form_class = MaintenanceForm
     template_name = "maintenance/maintenance_form.html"
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["organization"] = get_user_organization(self.request.user)
+        return kwargs
+
     def form_valid(self, form):
         with transaction.atomic():
             form.instance.created_by = self.request.user
+            form.instance.organization = get_user_organization(self.request.user)
             form.instance.performed_by = (
                 form.cleaned_data["performed_by"] or self.request.user
             )
             work_order = WorkOrder.objects.create(
                 number=allocate_work_order_number(),
+                organization=form.instance.organization,
                 client_rut=form.cleaned_data["client_rut"],
                 equipment=form.cleaned_data["equipment"],
                 created_by=self.request.user,
@@ -102,6 +113,14 @@ class MaintenanceUpdateView(LoginRequiredMixin, UpdateView):
     model = MaintenanceRecord
     form_class = MaintenanceForm
     template_name = "maintenance/maintenance_form.html"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(organization=get_user_organization(self.request.user))
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["organization"] = get_user_organization(self.request.user)
+        return kwargs
 
     def form_valid(self, form):
         form.instance.performed_by = (
@@ -124,9 +143,9 @@ class MaintenanceHistoryView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        self.equipment = get_object_or_404(Equipment, pk=self.kwargs["equipment_id"])
+        self.equipment = get_object_or_404(Equipment, pk=self.kwargs["equipment_id"], organization=get_user_organization(self.request.user))
         return MaintenanceRecord.objects.filter(
-            equipment=self.equipment
+            equipment=self.equipment, organization=get_user_organization(self.request.user)
         ).select_related("performed_by", "work_order")
 
     def get_context_data(self, **kwargs):

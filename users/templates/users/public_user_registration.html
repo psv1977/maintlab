@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Crear usuario | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Crear usuario para {{ organization.name }}</h1>
+    {% if is_first_user %}<p>Esta primera cuenta será administradora de la empresa.</p>{% else %}<p>Ingrese el código de invitación emitido por un administrador de la empresa.</p>{% endif %}
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Crear cuenta</button>
+    </form>
+  </main>
+{% endblock %}

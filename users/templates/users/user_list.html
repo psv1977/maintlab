@@ -6,6 +6,7 @@
   <main>
     <h1>Usuarios</h1>
     <p><a href="{% url 'users:create' %}">Nuevo usuario</a></p>
+    <p><a href="{% url 'users:invitations' %}">Gestionar invitaciones</a></p>
     {% if users %}
       <ul>
         {% for u in users %}

@@ -3,6 +3,7 @@ from django.db import models
 
 from equipment.models import Equipment
 from maintenance.models import WorkOrder
+from organizations.models import Organization, default_organization
 
 
 class Delivery(models.Model):
@@ -11,6 +12,7 @@ class Delivery(models.Model):
         DELIVERED = "delivered", "Entregado"
         RETURNED = "returned", "Recibido"
 
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, related_name="deliveries", default=default_organization)
     equipment = models.ForeignKey(
         Equipment, on_delete=models.PROTECT, related_name="deliveries"
     )

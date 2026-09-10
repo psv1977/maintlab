@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from equipment.models import Equipment
+from organizations.models import Organization, default_organization
 
 
 class DocumentSequence(models.Model):
@@ -18,6 +19,7 @@ class DocumentSequence(models.Model):
 
 
 class WorkOrder(models.Model):
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, related_name="work_orders", default=default_organization)
     number = models.CharField(max_length=20, unique=True, editable=False)
     client_rut = models.CharField(max_length=20, blank=True, db_index=True)
     equipment = models.ForeignKey(
@@ -52,6 +54,7 @@ class MaintenanceRecord(models.Model):
         IN_PROGRESS = "in_progress", "En curso"
         COMPLETED = "completed", "Completado"
 
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, related_name="maintenance_records", default=default_organization)
     equipment = models.ForeignKey(
         Equipment,
         on_delete=models.PROTECT,

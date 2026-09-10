@@ -24,7 +24,7 @@ def test_create_maintenance_generates_work_order(client, user, equipment):
         reverse("maintenance:create"),
         {
             "equipment": equipment.pk,
-            "client_rut": "76.123.456-7",
+            "client_rut": "76.123.456-0",
             "maintenance_type": "scheduled",
             "description": "Inspección",
             "performed_by": user.pk,
@@ -37,7 +37,7 @@ def test_create_maintenance_generates_work_order(client, user, equipment):
     work_order = WorkOrder.objects.get()
     record = MaintenanceRecord.objects.get()
     assert work_order.number == "OT-0001"
-    assert work_order.client_rut == "76.123.456-7"
+    assert work_order.client_rut == "76.123.456-0"
     assert record.work_order == work_order
 
 

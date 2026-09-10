@@ -37,6 +37,9 @@
     </dl>
     <a href="{% url 'equipment:update' equipment.pk %}">Editar</a>
     <a href="{% url 'maintenance:history' equipment.pk %}">Historial de mantenimiento</a>
+    {% if perms.deliveries.add_delivery %}
+      <a href="{% url 'deliveries:create' %}">Registrar entrega</a>
+    {% endif %}
     {% if perms.equipment.retire_equipment %}
       <a href="{% url 'equipment:retire' equipment.pk %}">Retirar</a>
     {% endif %}

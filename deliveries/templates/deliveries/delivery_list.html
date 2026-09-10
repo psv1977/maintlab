@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Entregas | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Entregas de equipos</h1>
+    {% if perms.deliveries.add_delivery %}<p><a class="button" href="{% url 'deliveries:create' %}">Nueva entrega</a></p>{% endif %}
+    {% if deliveries %}
+      <ul>
+        {% for delivery in deliveries %}
+          <li><a href="{% url 'deliveries:detail' delivery.pk %}">{{ delivery.equipment.name }}</a> para {{ delivery.client_name }} · {{ delivery.get_status_display }} · {{ delivery.delivered_at|date:"d/m/Y H:i" }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay entregas registradas.</p>
+    {% endif %}
+  </main>
+{% endblock %}

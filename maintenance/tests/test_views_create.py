@@ -41,6 +41,7 @@ def test_create_view_post_valid(client, user, equipment):
     client.force_login(user)
     data = {
         "equipment": equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "scheduled",
         "description": "Cambio de aceite",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
@@ -63,6 +64,7 @@ def test_create_view_post_invalid(client, user, equipment):
     client.force_login(user)
     data = {
         "equipment": equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "scheduled",
         "description": "",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
@@ -78,6 +80,7 @@ def test_create_view_sets_created_by(client, user, equipment):
     client.force_login(user)
     data = {
         "equipment": equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "scheduled",
         "description": "Cambio de aceite",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
@@ -94,6 +97,7 @@ def test_create_view_sets_performed_by(client, user, equipment):
     client.force_login(user)
     data = {
         "equipment": equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "scheduled",
         "description": "Cambio de aceite",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),

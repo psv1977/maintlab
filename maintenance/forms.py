@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from equipment.models import Equipment
 
 from .models import MaintenanceRecord
+from .rut import normalize_rut
 
 
 class MaintenanceForm(forms.ModelForm):
@@ -37,7 +38,11 @@ class MaintenanceForm(forms.ModelForm):
             "notes": "Notas",
         }
 
-    client_rut = forms.CharField(label="RUT del cliente", max_length=20, required=False)
+    client_rut = forms.CharField(
+        label="RUT del cliente",
+        max_length=20,
+        widget=forms.TextInput(attrs={"data-rut": "true", "autocomplete": "off"}),
+    )
     performed_by = forms.ModelChoiceField(
         label="Responsable del mantenimiento",
         queryset=User.objects.none(),
@@ -57,3 +62,6 @@ class MaintenanceForm(forms.ModelForm):
             for choice in MaintenanceRecord.Status.choices
             if choice[0] != MaintenanceRecord.Status.COMPLETED
         ]
+
+    def clean_client_rut(self):
+        return normalize_rut(self.cleaned_data["client_rut"])

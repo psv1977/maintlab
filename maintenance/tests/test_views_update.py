@@ -53,6 +53,7 @@ def test_update_view_post_valid(client, user, maintenance_record):
     client.force_login(user)
     data = {
         "equipment": maintenance_record.equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "unscheduled",
         "description": "Reparación de emergencia",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
@@ -74,6 +75,7 @@ def test_update_view_post_invalid(client, user, maintenance_record):
     client.force_login(user)
     data = {
         "equipment": maintenance_record.equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "scheduled",
         "description": "",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
@@ -89,6 +91,7 @@ def test_update_view_sets_updated_by(client, user, maintenance_record):
     client.force_login(user)
     data = {
         "equipment": maintenance_record.equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "scheduled",
         "description": "Cambio de aceite actualizado",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
@@ -105,6 +108,7 @@ def test_update_view_preserves_created_by(client, user, maintenance_record):
     client.force_login(user)
     data = {
         "equipment": maintenance_record.equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "scheduled",
         "description": "Cambio de aceite actualizado",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),

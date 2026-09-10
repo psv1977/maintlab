@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Editar entrega{% else %}Nueva entrega{% endif %} | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>{% if form.instance.pk %}Editar entrega{% else %}Nueva entrega{% endif %}</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Guardar</button>
+    </form>
+    <p><a href="{% url 'deliveries:list' %}">Cancelar</a></p>
+  </main>
+{% endblock %}

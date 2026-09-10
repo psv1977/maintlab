@@ -35,6 +35,7 @@ def retired_equipment(user):
 def test_maintenance_form_valid(equipment):
     data = {
         "equipment": equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "scheduled",
         "description": "Cambio de aceite",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
@@ -49,6 +50,7 @@ def test_maintenance_form_required_fields():
     form = MaintenanceForm(data={})
     assert not form.is_valid()
     assert "equipment" in form.errors
+    assert "client_rut" in form.errors
     assert "maintenance_type" in form.errors
     assert "description" in form.errors
     assert "performed_at" in form.errors
@@ -74,6 +76,7 @@ def test_maintenance_form_status_excludes_completed():
 def test_maintenance_form_optional_fields(equipment):
     data = {
         "equipment": equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "unscheduled",
         "description": "Reparación urgente",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
@@ -89,6 +92,7 @@ def test_maintenance_form_optional_fields(equipment):
 def test_maintenance_form_with_notes(equipment):
     data = {
         "equipment": equipment.pk,
+        "client_rut": "11.111.111-1",
         "maintenance_type": "scheduled",
         "description": "Revisión programada",
         "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),

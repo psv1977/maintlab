@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Entrega de {{ delivery.equipment.name }} | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Entrega de {{ delivery.equipment.name }}</h1>
+    <dl>
+      <dt>Equipo</dt><dd>{{ delivery.equipment.name }} ({{ delivery.equipment.code }})</dd>
+      <dt>Cliente</dt><dd>{{ delivery.client_name }}</dd>
+      <dt>RUT</dt><dd>{{ delivery.client_rut }}</dd>
+      <dt>Orden de trabajo</dt><dd>{{ delivery.work_order.number|default:"Sin orden asociada" }}</dd>
+      <dt>Responsable de entrega</dt><dd>{{ delivery.delivered_by.username }}</dd>
+      <dt>Persona que recibe</dt><dd>{{ delivery.received_by }}</dd>
+      <dt>Fecha de entrega</dt><dd>{{ delivery.delivered_at|date:"d/m/Y H:i" }}</dd>
+      <dt>Estado</dt><dd>{{ delivery.get_status_display }}</dd>
+      {% if delivery.returned_at %}<dt>Fecha de recepción</dt><dd>{{ delivery.returned_at|date:"d/m/Y H:i" }}</dd>{% endif %}
+      {% if delivery.notes %}<dt>Observaciones</dt><dd>{{ delivery.notes }}</dd>{% endif %}
+    </dl>
+    {% if perms.deliveries.change_delivery %}<p><a class="button" href="{% url 'deliveries:update' delivery.pk %}">Editar</a></p>{% endif %}
+    <p><a href="{% url 'deliveries:list' %}">Volver al listado</a></p>
+  </main>
+{% endblock %}

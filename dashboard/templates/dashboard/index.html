@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - MaintLab{% endblock %}
+
+{% block content %}
+<main>
+  <h1>Inicio</h1>
+
+  <section>
+    <h2>Equipos</h2>
+    <ul>
+      {% for status, info in equipment_by_status.items %}
+        <li>{{ info.label }}: {{ info.count }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section>
+    <h2>Mantenimientos</h2>
+    <ul>
+      {% for status, info in maintenance_by_status.items %}
+        <li>{{ info.label }}: {{ info.count }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section>
+    <h2>Órdenes de trabajo</h2>
+    <p>Total: {{ total_work_orders }}</p>
+  </section>
+
+  <section>
+    <h2>Últimos equipos</h2>
+    {% if recent_equipments %}
+      <ul>
+        {% for eq in recent_equipments %}
+          <li>
+            <a href="{% url 'equipment:detail' eq.pk %}">{{ eq.name }}</a>
+            ({{ eq.get_status_display }})
+            {% if eq.location %} - {{ eq.location.name }}{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay equipos registrados.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Últimos mantenimientos</h2>
+    {% if recent_maintenances %}
+      <ul>
+        {% for m in recent_maintenances %}
+          <li>
+            <a href="{% url 'maintenance:detail' m.pk %}">{{ m.equipment.name }}</a>
+            - {{ m.get_maintenance_type_display }}
+            ({{ m.get_status_display }})
+            {% if m.performed_by %} por {{ m.performed_by.username }}{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay mantenimientos registrados.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Próximos mantenimientos</h2>
+    {% if upcoming_maintenances %}
+      <ul>
+        {% for m in upcoming_maintenances %}
+          <li>
+            <a href="{% url 'maintenance:detail' m.pk %}">{{ m.equipment.name }}</a>
+            - {{ m.get_maintenance_type_display }}
+            el {{ m.next_maintenance|date:"d/m/Y H:i" }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No hay mantenimientos programados en los próximos 30 días.</p>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

@@ -15,7 +15,7 @@ def test_unknown_company_rut_starts_company_registration(client):
 
 
 @pytest.mark.django_db
-def test_first_company_user_is_staff_and_logged_in(client):
+def test_first_company_user_is_staff_and_logged_in(client, default_region, default_comuna):
     client.post(reverse("users:register"), {"rut": "76.123.456-0"})
     response = client.post(
         reverse("users:register-organization"),
@@ -23,6 +23,8 @@ def test_first_company_user_is_staff_and_logged_in(client):
             "name": "Empresa Uno SpA",
             "rut": "76.123.456-0",
             "business_line": "Servicios técnicos",
+            "region": default_region.pk,
+            "comuna": default_comuna.pk,
             "address": "Av. Principal 123",
         },
     )
@@ -46,8 +48,10 @@ def test_first_company_user_is_staff_and_logged_in(client):
 
 
 @pytest.mark.django_db
-def test_existing_company_requires_available_invitation(client):
-    organization = Organization.objects.create(name="Empresa Dos", rut="11.111.111-1")
+def test_existing_company_requires_available_invitation(client, default_region, default_comuna):
+    organization = Organization.objects.create(
+        name="Empresa Dos", rut="11.111.111-1", region=default_region, comuna=default_comuna
+    )
     administrator = User.objects.create_user(username="admin", password="test1234", is_staff=True)
     administrator.organization_membership.organization = organization
     administrator.organization_membership.save()
@@ -87,8 +91,10 @@ def test_existing_company_requires_available_invitation(client):
 
 
 @pytest.mark.django_db
-def test_staff_can_generate_and_revoke_its_organization_invitation(client):
-    organization = Organization.objects.create(name="Empresa Tres", rut="12.345.678-5")
+def test_staff_can_generate_and_revoke_its_organization_invitation(client, default_region, default_comuna):
+    organization = Organization.objects.create(
+        name="Empresa Tres", rut="12.345.678-5", region=default_region, comuna=default_comuna
+    )
     administrator = User.objects.create_user(username="admin", password="test1234", is_staff=True)
     administrator.organization_membership.organization = organization
     administrator.organization_membership.save()

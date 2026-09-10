@@ -9,6 +9,7 @@ urlpatterns = [
     path("register/", views.RegistrationStartView.as_view(), name="register"),
     path("register/organization/", views.OrganizationRegistrationView.as_view(), name="register-organization"),
     path("register/user/", views.PublicUserRegistrationView.as_view(), name="register-user"),
+    path("api/comunas/", views.comunas_por_region, name="comunas-por-region"),
     path("invitations/", views.InvitationListView.as_view(), name="invitations"),
     path("invitations/new/", views.InvitationCreateView.as_view(), name="invitation-create"),
     path("invitations/<int:pk>/revoke/", views.InvitationRevokeView.as_view(), name="invitation-revoke"),

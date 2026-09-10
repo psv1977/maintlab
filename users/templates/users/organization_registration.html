@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Registrar empresa | MaintLab{% endblock %}
 
@@ -8,8 +9,45 @@
     <p>Esta empresa aún no está registrada. Complete sus datos para crearla.</p>
     <form method="post">
       {% csrf_token %}
-      {{ form.as_p }}
+
+      <div>
+        <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+        {{ form.name }}
+        {% for error in form.name.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      </div>
+
+      <div>
+        <label for="{{ form.rut.id_for_label }}">{{ form.rut.label }}</label>
+        {{ form.rut }}
+        {% for error in form.rut.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      </div>
+
+      <div>
+        <label for="{{ form.business_line.id_for_label }}">{{ form.business_line.label }}</label>
+        {{ form.business_line }}
+        {% for error in form.business_line.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      </div>
+
+      <div>
+        <label for="{{ form.region.id_for_label }}">{{ form.region.label }}</label>
+        {{ form.region }}
+        {% for error in form.region.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      </div>
+
+      <div>
+        <label for="{{ form.comuna.id_for_label }}">{{ form.comuna.label }}</label>
+        {{ form.comuna }}
+        {% for error in form.comuna.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      </div>
+
+      <div>
+        <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+        {{ form.address }}
+        {% for error in form.address.errors %}<small class="error">{{ error }}</small>{% endfor %}
+      </div>
+
       <button type="submit">Crear empresa</button>
     </form>
   </main>
+  <script src="{% static 'js/geography.js' %}" defer></script>
 {% endblock %}

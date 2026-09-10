@@ -7,9 +7,13 @@ from organizations.models import Organization
 
 
 @pytest.mark.django_db
-def test_user_cannot_see_another_organization_equipment(client):
-    first_organization = Organization.objects.create(name="Empresa uno")
-    second_organization = Organization.objects.create(name="Empresa dos")
+def test_user_cannot_see_another_organization_equipment(client, default_region, default_comuna):
+    first_organization = Organization.objects.create(
+        name="Empresa uno", region=default_region, comuna=default_comuna
+    )
+    second_organization = Organization.objects.create(
+        name="Empresa dos", region=default_region, comuna=default_comuna
+    )
     first_user = User.objects.create_user(username="uno", password="test1234")
     second_user = User.objects.create_user(username="dos", password="test1234")
     first_user.organization_membership.organization = first_organization

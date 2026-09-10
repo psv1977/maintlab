@@ -3,7 +3,7 @@ from django.contrib.auth.forms import SetPasswordForm, UserCreationForm
 from django.contrib.auth.models import User
 
 from maintenance.rut import normalize_rut
-from organizations.models import Organization, OrganizationInvitation
+from organizations.models import Comuna, Organization, OrganizationInvitation, Region
 
 
 class UserForm(forms.ModelForm):
@@ -95,19 +95,53 @@ class OrganizationRutForm(forms.Form):
 
 
 class OrganizationRegistrationForm(forms.ModelForm):
+    region = forms.ModelChoiceField(
+        queryset=Region.objects.all(),
+        label="Región",
+        empty_label="-- Seleccionar región --",
+    )
+    comuna = forms.ModelChoiceField(
+        queryset=Comuna.objects.none(),
+        label="Comuna",
+        empty_label="-- Seleccionar comuna --",
+    )
+
     class Meta:
         model = Organization
-        fields = ["name", "rut", "business_line", "address"]
+        fields = ["name", "rut", "business_line", "region", "comuna", "address"]
         labels = {
             "name": "Razón social",
             "rut": "RUT de la empresa",
             "business_line": "Giro",
             "address": "Dirección",
         }
-        widgets = {"rut": forms.TextInput(attrs={"data-rut": "true", "autocomplete": "off"})}
+        widgets = {
+            "rut": forms.TextInput(attrs={"data-rut": "true", "autocomplete": "off"}),
+            "region": forms.Select(attrs={"data-comunas-url": "/users/api/comunas/"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.data.get("region"):
+            try:
+                region_id = int(self.data.get("region"))
+                self.fields["comuna"].queryset = Comuna.objects.filter(region_id=region_id)
+            except (ValueError, TypeError):
+                pass
+
+    def clean(self):
+        cleaned_data = super().clean()
+        region = cleaned_data.get("region")
+        comuna = cleaned_data.get("comuna")
+        if region and comuna and comuna.region != region:
+            self.add_error("comuna", "La comuna seleccionada no pertenece a la región elegida.")
+        return cleaned_data
 
     def clean_rut(self):
-        return normalize_rut(self.cleaned_data["rut"])
+        value = self.cleaned_data.get("rut")
+        if not value:
+            return value
+        return normalize_rut(value)
 
 
 class PublicUserRegistrationForm(UserCreationForm):

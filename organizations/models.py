@@ -6,10 +6,38 @@ from django.db import connection, models
 from django.utils import timezone
 
 
+class Region(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    class Meta:
+        verbose_name = "región"
+        verbose_name_plural = "regiones"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Comuna(models.Model):
+    region = models.ForeignKey(Region, on_delete=models.PROTECT, related_name="comunas")
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = "comuna"
+        verbose_name_plural = "comunas"
+        unique_together = ["region", "name"]
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.name} ({self.region})"
+
+
 class Organization(models.Model):
     name = models.CharField(max_length=200, unique=True)
     rut = models.CharField(max_length=20, unique=True, blank=True, null=True)
     business_line = models.CharField(max_length=200, blank=True)
+    region = models.ForeignKey(Region, on_delete=models.PROTECT)
+    comuna = models.ForeignKey(Comuna, on_delete=models.PROTECT)
     address = models.CharField(max_length=300, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

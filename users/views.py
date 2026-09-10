@@ -2,6 +2,7 @@ from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -17,7 +18,7 @@ from .forms import (
     UserGroupsForm,
     UserPasswordForm,
 )
-from organizations.models import Organization, OrganizationInvitation
+from organizations.models import Comuna, Organization, OrganizationInvitation
 from organizations.tenant import get_user_organization
 
 
@@ -244,3 +245,11 @@ class UserPasswordUpdateView(StaffRequiredMixin, FormView):
     def form_valid(self, form):
         form.save()
         return redirect(self.get_success_url())
+
+
+def comunas_por_region(request):
+    region_id = request.GET.get("region_id")
+    if not region_id:
+        return JsonResponse([], safe=False)
+    comunas = Comuna.objects.filter(region_id=region_id).values_list("id", "name")
+    return JsonResponse(list(comunas), safe=False)

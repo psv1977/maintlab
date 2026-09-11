@@ -1,6 +1,4 @@
 from django import forms
-from django.contrib.auth.models import User
-
 from equipment.models import Equipment
 from maintenance.models import WorkOrder
 from maintenance.rut import normalize_rut
@@ -16,7 +14,6 @@ class DeliveryForm(forms.ModelForm):
             "work_order",
             "client_name",
             "client_rut",
-            "delivered_by",
             "received_by",
             "delivered_at",
             "returned_at",
@@ -28,7 +25,6 @@ class DeliveryForm(forms.ModelForm):
             "work_order": "Orden de trabajo",
             "client_name": "Cliente",
             "client_rut": "RUT del cliente",
-            "delivered_by": "Responsable de entrega",
             "received_by": "Persona que recibe",
             "delivered_at": "Fecha de entrega",
             "returned_at": "Fecha de recepción",
@@ -50,8 +46,6 @@ class DeliveryForm(forms.ModelForm):
         if organization:
             self.fields["equipment"].queryset = self.fields["equipment"].queryset.filter(organization=organization)
             self.fields["work_order"].queryset = self.fields["work_order"].queryset.filter(organization=organization)
-        self.fields["delivered_by"].queryset = User.objects.filter(is_active=True)
-
     def clean_client_rut(self):
         return normalize_rut(self.cleaned_data["client_rut"])
 

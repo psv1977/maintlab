@@ -8,6 +8,7 @@ app_name = "equipment"
 urlpatterns = [
     path("", views.EquipmentListView.as_view(), name="list"),
     path("new/", views.EquipmentCreateView.as_view(), name="create"),
+    path("locations/new/", views.LocationCreateView.as_view(), name="location-create"),
     path("import/", views.EquipmentImportView.as_view(), name="import"),
     path("<int:pk>/", views.EquipmentDetailView.as_view(), name="detail"),
     path("<int:pk>/edit/", views.EquipmentUpdateView.as_view(), name="update"),

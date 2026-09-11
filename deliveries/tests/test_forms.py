@@ -28,6 +28,13 @@ def test_delivery_form_normalizes_client_rut():
 
 
 @pytest.mark.django_db
+def test_delivery_form_does_not_expose_responsible_user():
+    form = DeliveryForm()
+
+    assert "delivered_by" not in form.fields
+
+
+@pytest.mark.django_db
 def test_delivery_form_rejects_work_order_from_another_equipment():
     user = User.objects.create_user(username="tecnico")
     equipment = Equipment.objects.create(name="Bomba", code="BOM-001", created_by=user)

@@ -2,7 +2,7 @@ from django import forms
 
 from organizations.models import default_organization
 
-from .models import Equipment
+from .models import Equipment, Location
 
 
 class EquipmentForm(forms.ModelForm):
@@ -53,6 +53,21 @@ class EquipmentForm(forms.ModelForm):
         if queryset.exists():
             raise forms.ValidationError("Ya existe un equipo con este código en la empresa.")
         return code
+
+
+class LocationForm(forms.ModelForm):
+    class Meta:
+        model = Location
+        fields = ["name", "description"]
+        labels = {
+            "name": "Nombre",
+            "description": "Descripción",
+        }
+
+    def __init__(self, *args, organization=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if organization:
+            self.instance.organization = organization
 
 
 class EquipmentImportForm(forms.Form):

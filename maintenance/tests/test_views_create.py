@@ -34,6 +34,7 @@ def test_create_view_get(client, user):
     response = client.get(reverse("maintenance:create"))
     assert response.status_code == 200
     assert "form" in response.context
+    assert 'href="/equipment/new/"' in response.content.decode()
 
 
 @pytest.mark.django_db
@@ -106,3 +107,23 @@ def test_create_view_sets_performed_by(client, user, equipment):
     client.post(reverse("maintenance:create"), data)
     record = MaintenanceRecord.objects.get(description="Cambio de aceite")
     assert record.performed_by == user
+
+
+@pytest.mark.django_db
+def test_create_view_ignores_submitted_responsible_user(client, user, equipment):
+    other_user = User.objects.create_user(username="otro", password="test1234")
+    client.force_login(user)
+    data = {
+        "equipment": equipment.pk,
+        "client_rut": "11.111.111-1",
+        "maintenance_type": "scheduled",
+        "description": "Cambio de filtro",
+        "performed_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
+        "status": "pending",
+        "performed_by": other_user.pk,
+    }
+
+    response = client.post(reverse("maintenance:create"), data)
+
+    assert response.status_code == 302
+    assert MaintenanceRecord.objects.get(description="Cambio de filtro").performed_by == user

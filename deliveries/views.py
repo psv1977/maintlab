@@ -41,6 +41,7 @@ class DeliveryCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
+        form.instance.delivered_by = self.request.user
         form.instance.organization = get_user_organization(self.request.user)
         return super().form_valid(form)
 

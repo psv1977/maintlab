@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from .forms import EquipmentForm, EquipmentImportForm
+from .forms import EquipmentForm, EquipmentImportForm, LocationForm
 from .models import Equipment, Location
 from organizations.tenant import get_user_organization
 
@@ -71,6 +71,24 @@ class EquipmentCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse("equipment:list")
+
+
+class LocationCreateView(LoginRequiredMixin, CreateView):
+    model = Location
+    form_class = LocationForm
+    template_name = "equipment/location_form.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["organization"] = get_user_organization(self.request.user)
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.organization = get_user_organization(self.request.user)
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("equipment:create")
 
 
 class EquipmentUpdateView(LoginRequiredMixin, UpdateView):

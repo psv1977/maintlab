@@ -7,6 +7,10 @@
     <h1>{% if form.instance.pk %}Editar entrega{% else %}Nueva entrega{% endif %}</h1>
     <form method="post">
       {% csrf_token %}
+      {% if not form.instance.pk %}
+        <p>¿No existe el equipo? <a class="button" href="{% url 'equipment:create' %}">Crear equipo</a></p>
+        <p>¿Necesitas una orden de trabajo? <a class="button" href="{% url 'maintenance:create' %}">Crear mantenimiento / OT</a></p>
+      {% endif %}
       {{ form.as_p }}
       <button type="submit">Guardar</button>
     </form>

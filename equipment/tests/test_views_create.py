@@ -2,7 +2,7 @@ import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-from equipment.models import Equipment
+from equipment.models import Equipment, Location
 
 
 @pytest.fixture
@@ -119,3 +119,25 @@ def test_status_retired_cannot_be_submitted(client, user):
 
     assert response.status_code == 200
     assert Equipment.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_location_create_requires_login(client):
+    response = client.get(reverse("equipment:location-create"))
+
+    assert response.status_code == 302
+    assert response.url.startswith("/accounts/login/")
+
+
+@pytest.mark.django_db
+def test_location_create_redirects_to_new_equipment(client, user):
+    client.force_login(user)
+
+    response = client.post(
+        reverse("equipment:location-create"),
+        {"name": "Sala eléctrica", "description": "Tableros principales"},
+    )
+
+    assert response.status_code == 302
+    assert response.url == reverse("equipment:create")
+    assert Location.objects.get(name="Sala eléctrica").description == "Tableros principales"

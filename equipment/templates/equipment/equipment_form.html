@@ -8,6 +8,9 @@
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}
+      {% if not object %}
+        <p><a class="button" href="{% url 'equipment:location-create' %}">Crear ubicación física</a></p>
+      {% endif %}
       <button type="submit">Guardar</button>
       {% if object %}
         <a href="{% url 'equipment:detail' object.pk %}">Cancelar</a>

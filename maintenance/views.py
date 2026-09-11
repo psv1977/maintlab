@@ -91,9 +91,7 @@ class MaintenanceCreateView(LoginRequiredMixin, CreateView):
         with transaction.atomic():
             form.instance.created_by = self.request.user
             form.instance.organization = get_user_organization(self.request.user)
-            form.instance.performed_by = (
-                form.cleaned_data["performed_by"] or self.request.user
-            )
+            form.instance.performed_by = self.request.user
             work_order = WorkOrder.objects.create(
                 number=allocate_work_order_number(),
                 organization=form.instance.organization,
@@ -123,9 +121,6 @@ class MaintenanceUpdateView(LoginRequiredMixin, UpdateView):
         return kwargs
 
     def form_valid(self, form):
-        form.instance.performed_by = (
-            form.cleaned_data["performed_by"] or self.request.user
-        )
         if form.instance.work_order_id:
             form.instance.work_order.client_rut = form.cleaned_data["client_rut"]
             form.instance.work_order.save(update_fields=["client_rut"])

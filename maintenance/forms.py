@@ -1,6 +1,4 @@
 from django import forms
-from django.contrib.auth.models import User
-
 from equipment.models import Equipment
 
 from .models import MaintenanceRecord
@@ -15,7 +13,6 @@ class MaintenanceForm(forms.ModelForm):
             "client_rut",
             "maintenance_type",
             "description",
-            "performed_by",
             "performed_at",
             "completed_at",
             "next_maintenance",
@@ -43,12 +40,6 @@ class MaintenanceForm(forms.ModelForm):
         max_length=20,
         widget=forms.TextInput(attrs={"data-rut": "true", "autocomplete": "off"}),
     )
-    performed_by = forms.ModelChoiceField(
-        label="Responsable del mantenimiento",
-        queryset=User.objects.none(),
-        required=False,
-    )
-
     def __init__(self, *args, organization=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["equipment"].queryset = Equipment.objects.exclude(
@@ -56,7 +47,6 @@ class MaintenanceForm(forms.ModelForm):
         )
         if organization:
             self.fields["equipment"].queryset = self.fields["equipment"].queryset.filter(organization=organization)
-        self.fields["performed_by"].queryset = User.objects.filter(is_active=True)
         if self.instance.pk and self.instance.work_order_id:
             self.initial["client_rut"] = self.instance.work_order.client_rut
         self.fields["status"].choices = [

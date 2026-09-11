@@ -46,6 +46,13 @@ def test_maintenance_form_valid(equipment):
 
 
 @pytest.mark.django_db
+def test_maintenance_form_does_not_expose_responsible_user():
+    form = MaintenanceForm()
+
+    assert "performed_by" not in form.fields
+
+
+@pytest.mark.django_db
 def test_maintenance_form_required_fields():
     form = MaintenanceForm(data={})
     assert not form.is_valid()

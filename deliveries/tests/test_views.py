@@ -46,6 +46,40 @@ def test_technician_creates_delivery(client, technician, equipment):
     delivery = Delivery.objects.get()
     assert delivery.client_rut == "76.123.456-0"
     assert delivery.created_by == technician
+    assert delivery.delivered_by == technician
+
+
+@pytest.mark.django_db
+def test_delivery_create_shows_related_creation_links(client, technician, equipment):
+    client.force_login(technician)
+
+    response = client.get(reverse("deliveries:create"))
+    content = response.content.decode()
+
+    assert 'href="/equipment/new/"' in content
+    assert 'href="/maintenance/new/"' in content
+
+
+@pytest.mark.django_db
+def test_delivery_create_uses_authenticated_user_as_responsible(client, technician, equipment):
+    other_user = User.objects.create_user(username="otro", password="test1234")
+    client.force_login(technician)
+
+    response = client.post(
+        reverse("deliveries:create"),
+        {
+            "equipment": equipment.pk,
+            "client_name": "Cliente SpA",
+            "client_rut": "76.123.456-0",
+            "received_by": "Ana Pérez",
+            "delivered_at": timezone.now().strftime("%Y-%m-%dT%H:%M"),
+            "status": "delivered",
+            "delivered_by": other_user.pk,
+        },
+    )
+
+    assert response.status_code == 302
+    assert Delivery.objects.get().delivered_by == technician
 
 
 @pytest.mark.django_db

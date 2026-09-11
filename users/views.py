@@ -1,6 +1,7 @@
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -149,6 +150,8 @@ class UserListView(StaffRequiredMixin, ListView):
     ordering = ["username"]
 
     def get_queryset(self):
+        if self.request.user.is_superuser:
+            return User.objects.all().order_by("username")
         return User.objects.filter(organization_membership__organization=get_user_organization(self.request.user)).order_by("username")
 
 
@@ -158,6 +161,8 @@ class UserDetailView(StaffRequiredMixin, DetailView):
     context_object_name = "user_obj"
 
     def get_queryset(self):
+        if self.request.user.is_superuser:
+            return User.objects.all()
         return User.objects.filter(organization_membership__organization=get_user_organization(self.request.user))
 
 
@@ -196,7 +201,50 @@ class UserUpdateView(StaffRequiredMixin, UpdateView):
         return reverse("users:detail", args=[self.object.pk])
 
     def get_queryset(self):
+        if self.request.user.is_superuser:
+            return User.objects.all()
         return User.objects.filter(organization_membership__organization=get_user_organization(self.request.user))
+
+
+class UserDeactivateView(LoginRequiredMixin, View):
+    template_name = "users/user_deactivate_confirm.html"
+
+    def get_target_user(self, request, pk):
+        if request.user.is_superuser:
+            return get_object_or_404(User, pk=pk)
+
+        target = get_object_or_404(
+            User,
+            pk=pk,
+            organization_membership__organization=get_user_organization(request.user),
+        )
+        if target.is_staff:
+            raise PermissionDenied("Solo un superusuario puede desactivar administradores.")
+        return target
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.is_staff:
+            if not request.user.is_authenticated:
+                return self.handle_no_permission()
+            raise PermissionDenied
+
+        self.target = self.get_target_user(request, kwargs["pk"])
+        if self.target == request.user:
+            raise PermissionDenied("No puede desactivar su propia cuenta.")
+        if self.target.is_superuser and User.objects.filter(is_active=True, is_superuser=True).count() <= 1:
+            raise PermissionDenied("No puede desactivar al último superusuario activo.")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {"user_obj": self.target})
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get("confirm") != "yes":
+            return self.get(request, *args, **kwargs)
+        self.target.is_active = False
+        self.target.is_staff = False
+        self.target.save(update_fields=["is_active", "is_staff"])
+        return redirect("users:list")
 
 
 class UserGroupsUpdateView(StaffRequiredMixin, UpdateView):
@@ -206,6 +254,8 @@ class UserGroupsUpdateView(StaffRequiredMixin, UpdateView):
     success_url = "/users/"
 
     def get_queryset(self):
+        if self.request.user.is_superuser:
+            return User.objects.all()
         return User.objects.filter(organization_membership__organization=get_user_organization(self.request.user))
 
     def get_form_kwargs(self):
@@ -226,7 +276,12 @@ class UserPasswordUpdateView(StaffRequiredMixin, FormView):
     template_name = "users/user_password_form.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.user_obj = get_object_or_404(User, pk=kwargs["pk"], organization_membership__organization=get_user_organization(request.user))
+        queryset = User.objects.all()
+        if not request.user.is_superuser:
+            queryset = queryset.filter(
+                organization_membership__organization=get_user_organization(request.user)
+            )
+        self.user_obj = get_object_or_404(queryset, pk=kwargs["pk"])
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):

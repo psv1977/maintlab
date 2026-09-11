@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Desactivar acceso | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Desactivar acceso</h1>
+    <p>¿Confirma que desea desactivar el acceso de <strong>{{ user_obj.username }}</strong>?</p>
+    <p>Empresa: {{ user_obj.organization_membership.organization.name|default:"Sin empresa" }}</p>
+    <p>El usuario no podrá iniciar sesión. Sus registros históricos se conservarán.</p>
+    {% if user_obj.is_staff %}<p>También perderá sus privilegios administrativos.</p>{% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" name="confirm" value="yes">Confirmar desactivación</button>
+      <a href="{% url 'users:detail' user_obj.pk %}">Cancelar</a>
+    </form>
+  </main>
+{% endblock %}

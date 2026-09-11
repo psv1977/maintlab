@@ -2,6 +2,8 @@ import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
 
+from equipment.models import Equipment
+
 
 @pytest.fixture
 def admin_user():
@@ -126,6 +128,80 @@ def test_user_update_view_post_valid(client, staff_user, regular_user):
     regular_user.refresh_from_db()
     assert regular_user.first_name == "Juan"
     assert regular_user.last_name == "Pérez"
+
+
+@pytest.mark.django_db
+def test_staff_can_confirm_deactivation_of_regular_user(client, staff_user, regular_user):
+    client.force_login(staff_user)
+
+    confirmation = client.get(reverse("users:deactivate", args=[regular_user.pk]))
+    assert confirmation.status_code == 200
+    assert b"Confirmar desactivaci" in confirmation.content
+
+    not_confirmed = client.post(reverse("users:deactivate", args=[regular_user.pk]))
+    assert not_confirmed.status_code == 200
+    regular_user.refresh_from_db()
+    assert regular_user.is_active
+
+    response = client.post(
+        reverse("users:deactivate", args=[regular_user.pk]),
+        {"confirm": "yes"},
+    )
+    assert response.status_code == 302
+    regular_user.refresh_from_db()
+    assert not regular_user.is_active
+    assert not regular_user.is_staff
+
+
+@pytest.mark.django_db
+def test_deactivation_preserves_user_history(client, staff_user, regular_user):
+    equipment = Equipment.objects.create(
+        name="Equipo histórico",
+        code="HIST-001",
+        created_by=regular_user,
+    )
+    client.force_login(staff_user)
+
+    client.post(
+        reverse("users:deactivate", args=[regular_user.pk]),
+        {"confirm": "yes"},
+    )
+
+    assert Equipment.objects.get(pk=equipment.pk).created_by == regular_user
+
+
+@pytest.mark.django_db
+def test_staff_cannot_deactivate_another_staff_user(client, staff_user):
+    other_staff = User.objects.create_user(username="otro_staff", is_staff=True)
+    client.force_login(staff_user)
+
+    response = client.get(reverse("users:deactivate", args=[other_staff.pk]))
+
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_superuser_can_deactivate_staff_user(client, admin_user, staff_user):
+    client.force_login(admin_user)
+
+    response = client.post(
+        reverse("users:deactivate", args=[staff_user.pk]),
+        {"confirm": "yes"},
+    )
+
+    assert response.status_code == 302
+    staff_user.refresh_from_db()
+    assert not staff_user.is_active
+    assert not staff_user.is_staff
+
+
+@pytest.mark.django_db
+def test_user_cannot_deactivate_own_account(client, staff_user):
+    client.force_login(staff_user)
+
+    response = client.get(reverse("users:deactivate", args=[staff_user.pk]))
+
+    assert response.status_code == 403
 
 
 @pytest.mark.django_db

@@ -122,6 +122,7 @@ class OrganizationRegistrationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["region"].widget.attrs.update({"data-comunas-url": "/users/api/comunas/"})
         if self.data.get("region"):
             try:
                 region_id = int(self.data.get("region"))

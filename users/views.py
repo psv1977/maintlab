@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
@@ -56,6 +58,10 @@ class OrganizationRegistrationView(FormView):
 
     def form_valid(self, form):
         organization = form.save()
+        organization.account_status = Organization.AccountStatus.DEMO
+        organization.demo_started_at = timezone.now()
+        organization.demo_ends_at = timezone.now() + timedelta(days=14)
+        organization.save(update_fields=["account_status", "demo_started_at", "demo_ends_at"])
         self.request.session["registration_organization_id"] = organization.pk
         self.request.session["registration_new_organization"] = True
         self.request.session.pop("registration_organization_rut", None)

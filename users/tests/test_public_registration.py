@@ -1,6 +1,7 @@
 import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 
 from organizations.models import Organization, OrganizationInvitation
 
@@ -44,6 +45,9 @@ def test_first_company_user_is_staff_and_logged_in(client, default_region, defau
     assert response.url == reverse("dashboard:index")
     assert user.is_staff
     assert user.organization_membership.organization.rut == "76.123.456-0"
+    organization = user.organization_membership.organization
+    assert organization.account_status == organization.AccountStatus.DEMO
+    assert organization.demo_ends_at > timezone.now()
     assert "_auth_user_id" in client.session
 
 

@@ -7,8 +7,8 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from .forms import EquipmentForm, EquipmentImportForm, LocationForm
-from .models import Equipment, Location
+from .forms import EquipmentForm, EquipmentIdentifierForm, EquipmentImportForm, LocationForm, MeterReadingForm
+from .models import Equipment, EquipmentIdentifier, Location, MeterReading
 from organizations.tenant import get_user_organization
 
 
@@ -52,6 +52,14 @@ class EquipmentDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         return super().get_queryset().filter(organization=get_user_organization(self.request.user))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["meter_readings"] = self.object.meter_readings.select_related("recorded_by")[:10]
+        context["latest_meter_reading"] = context["meter_readings"][0] if context["meter_readings"] else None
+        context["maintenance_plans"] = self.object.maintenance_plans.filter(active=True)
+        context["identifiers"] = self.object.identifiers.all()
+        return context
+
 
 class EquipmentCreateView(LoginRequiredMixin, CreateView):
     model = Equipment
@@ -89,6 +97,64 @@ class LocationCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse("equipment:create")
+
+
+class MeterReadingCreateView(LoginRequiredMixin, CreateView):
+    model = MeterReading
+    form_class = MeterReadingForm
+    template_name = "equipment/meter_reading_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.equipment = get_object_or_404(
+            Equipment,
+            pk=kwargs["equipment_id"],
+            organization=get_user_organization(request.user),
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["equipment"] = self.equipment
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["equipment"] = self.equipment
+        return context
+
+    def form_valid(self, form):
+        form.instance.equipment = self.equipment
+        form.instance.organization = self.equipment.organization
+        form.instance.recorded_by = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("equipment:detail", args=[self.equipment.pk])
+
+
+class EquipmentIdentifierCreateView(LoginRequiredMixin, CreateView):
+    model = EquipmentIdentifier
+    form_class = EquipmentIdentifierForm
+    template_name = "equipment/equipment_identifier_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.equipment = get_object_or_404(
+            Equipment, pk=kwargs["equipment_id"], organization=get_user_organization(request.user),
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["equipment"] = self.equipment
+        return context
+
+    def form_valid(self, form):
+        form.instance.equipment = self.equipment
+        form.instance.organization = self.equipment.organization
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("equipment:detail", args=[self.equipment.pk])
 
 
 class EquipmentUpdateView(LoginRequiredMixin, UpdateView):

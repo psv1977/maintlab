@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar {{ equipment.measurement_unit_label|lower }} | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Registrar {{ equipment.measurement_unit_label|lower }}</h1>
+    <p><strong>Equipo:</strong> {{ equipment.name }}</p>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Guardar lectura</button>
+      <a href="{% url 'equipment:detail' equipment.pk %}">Cancelar</a>
+    </form>
+  </main>
+{% endblock %}

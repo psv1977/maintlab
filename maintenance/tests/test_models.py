@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from equipment.models import Equipment
-from maintenance.models import MaintenanceRecord
+from maintenance.models import MaintenancePlan, MaintenanceRecord
 
 
 @pytest.fixture
@@ -145,3 +145,32 @@ def test_maintenance_record_meta_verbose_name():
 def test_maintenance_record_equipment_relationship(maintenance_record, equipment):
     assert maintenance_record.equipment == equipment
     assert maintenance_record in equipment.maintenance_records.all()
+
+
+@pytest.mark.django_db
+def test_time_plan_is_due_after_interval(user, equipment):
+    plan = MaintenancePlan.objects.create(
+        equipment=equipment,
+        name="Inspección semestral",
+        strategy=MaintenancePlan.Strategy.TIME,
+        interval_days=180,
+        created_by=user,
+        last_service_at=timezone.now() - timezone.timedelta(days=181),
+    )
+
+    assert plan.is_due()
+
+
+@pytest.mark.django_db
+def test_meter_plan_is_due_after_interval(user, equipment):
+    plan = MaintenancePlan.objects.create(
+        equipment=equipment,
+        name="Servicio por uso",
+        strategy=MaintenancePlan.Strategy.METER,
+        interval_value="500.00",
+        created_by=user,
+        last_service_meter="1000.00",
+    )
+
+    assert not plan.is_due(meter_value=1499)
+    assert plan.is_due(meter_value=1500)

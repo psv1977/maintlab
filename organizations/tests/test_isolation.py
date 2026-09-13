@@ -1,6 +1,9 @@
+from datetime import timedelta
+
 import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 
 from equipment.models import Equipment
 from organizations.models import Organization
@@ -45,3 +48,27 @@ def test_import_is_only_available_to_staff(client):
     user.is_staff = True
     user.save(update_fields=["is_staff"])
     assert client.get(reverse("equipment:import")).status_code == 200
+
+
+@pytest.mark.django_db
+def test_expired_demo_allows_reading_but_blocks_writes(client, default_region, default_comuna):
+    organization = Organization.objects.create(
+        name="Demo vencida",
+        region=default_region,
+        comuna=default_comuna,
+        account_status=Organization.AccountStatus.DEMO,
+        demo_ends_at=timezone.now() - timedelta(days=1),
+    )
+    user = User.objects.create_user(username="demo", password="test1234")
+    user.organization_membership.organization = organization
+    user.organization_membership.save()
+    client.force_login(user)
+
+    assert client.get(reverse("equipment:list")).status_code == 200
+    response = client.post(
+        reverse("equipment:create"),
+        {"name": "Equipo bloqueado", "code": "BLOCK-001"},
+    )
+
+    assert response.status_code == 403
+    assert not Equipment.objects.filter(code="BLOCK-001").exists()

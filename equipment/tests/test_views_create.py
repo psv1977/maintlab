@@ -2,12 +2,21 @@ import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
 
-from equipment.models import Equipment, Location
+from equipment.models import Equipment, Location, MeterReading
 
 
 @pytest.fixture
 def user():
     return User.objects.create_user(username="tecnico", password="test1234")
+
+
+@pytest.fixture
+def equipment(user):
+    return Equipment.objects.create(
+        name="Compresor principal",
+        code="COMP-001",
+        created_by=user,
+    )
 
 
 def form_data(**overrides):
@@ -141,3 +150,43 @@ def test_location_create_redirects_to_new_equipment(client, user):
     assert response.status_code == 302
     assert response.url == reverse("equipment:create")
     assert Location.objects.get(name="Sala eléctrica").description == "Tableros principales"
+
+
+@pytest.mark.django_db
+def test_meter_reading_create_uses_equipment_unit(client, user, equipment):
+    client.force_login(user)
+
+    response = client.get(reverse("equipment:reading-create", args=[equipment.pk]))
+
+    assert response.status_code == 200
+    assert "Horómetro" in response.content.decode()
+
+    response = client.post(
+        reverse("equipment:reading-create", args=[equipment.pk]),
+        {"value": "1250.50", "recorded_at": "2026-09-12T10:00", "notes": "Lectura inicial"},
+    )
+
+    assert response.status_code == 302
+    reading = MeterReading.objects.get()
+    assert reading.value == 1250.50
+    assert reading.recorded_by == user
+    assert reading.organization == equipment.organization
+
+
+@pytest.mark.django_db
+def test_meter_reading_cannot_decrease(client, user, equipment):
+    MeterReading.objects.create(
+        equipment=equipment,
+        organization=equipment.organization,
+        value="1250.00",
+        recorded_by=user,
+    )
+    client.force_login(user)
+
+    response = client.post(
+        reverse("equipment:reading-create", args=[equipment.pk]),
+        {"value": "1249.99", "recorded_at": "2026-09-12T10:00"},
+    )
+
+    assert response.status_code == 200
+    assert MeterReading.objects.count() == 1

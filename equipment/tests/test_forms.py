@@ -76,3 +76,26 @@ def test_unknown_status_is_rejected(user):
 
     assert not form.is_valid()
     assert "status" in form.errors
+
+
+@pytest.mark.django_db
+def test_equipment_type_defaults_to_industrial(user):
+    form = EquipmentForm(data=form_data())
+
+    assert form.is_valid()
+    equipment = form.save(commit=False)
+    assert equipment.equipment_type == Equipment.EquipmentType.INDUSTRIAL
+    assert equipment.measurement_unit == "hours"
+    assert equipment.measurement_unit_label == "Horómetro"
+
+
+@pytest.mark.django_db
+def test_automotive_equipment_uses_kilometers(user):
+    form = EquipmentForm(
+        data=form_data(equipment_type=Equipment.EquipmentType.AUTOMOTIVE)
+    )
+
+    assert form.is_valid()
+    equipment = form.save(commit=False)
+    assert equipment.measurement_unit == "kilometers"
+    assert equipment.measurement_unit_label == "Kilometraje"

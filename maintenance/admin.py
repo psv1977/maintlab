@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import MaintenanceRecord, WorkOrder
+from .models import MaintenancePlan, MaintenanceRecord, WorkOrder
 from organizations.admin import OrganizationScopedAdmin
 
 
@@ -37,6 +37,23 @@ class MaintenanceRecordAdmin(OrganizationScopedAdmin):
         "updated_by",
         "updated_at",
     ]
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(MaintenancePlan)
+class MaintenancePlanAdmin(OrganizationScopedAdmin):
+    list_display = ["name", "equipment", "strategy", "interval_days", "interval_value", "active"]
+    list_filter = ["strategy", "active"]
+    search_fields = ["name", "equipment__name", "equipment__code"]
+    readonly_fields = ["created_by", "created_at"]
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.organization = obj.equipment.organization
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
 
     def has_delete_permission(self, request, obj=None):
         return False

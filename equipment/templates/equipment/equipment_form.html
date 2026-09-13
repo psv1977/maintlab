@@ -9,14 +9,15 @@
       {% csrf_token %}
       {{ form.as_p }}
       {% if not object %}
-        <p><a class="button" href="{% url 'equipment:location-create' %}">Crear ubicación física</a></p>
+        <p><a class="button button-secondary" href="{% url 'equipment:location-create' %}">Crear ubicación física</a> <a class="button button-secondary" href="{% url 'organizations:customer-create' %}">Crear cliente o propietario</a></p>
       {% endif %}
-      <button type="submit">Guardar</button>
+      <div class="action-group"><button type="submit">Guardar</button>
       {% if object %}
-        <a href="{% url 'equipment:detail' object.pk %}">Cancelar</a>
+        <a class="button button-secondary" href="{% url 'equipment:detail' object.pk %}">Cancelar</a>
       {% else %}
-        <a href="{% url 'equipment:list' %}">Cancelar</a>
+        <a class="button button-secondary" href="{% url 'equipment:list' %}">Cancelar</a>
       {% endif %}
+      </div>
     </form>
   </main>
 {% endblock %}

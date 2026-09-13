@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar identificador | MaintLab{% endblock %}
+
+{% block content %}
+<main>
+  <h1>Agregar identificador: {{ equipment.name }}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="action-group"><button type="submit">Guardar identificador</button><a class="button button-secondary" href="{% url 'equipment:detail' equipment.pk %}">Cancelar</a></div>
+  </form>
+</main>
+{% endblock %}

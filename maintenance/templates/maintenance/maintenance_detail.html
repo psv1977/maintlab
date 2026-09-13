@@ -12,6 +12,9 @@
     <p><strong>Código:</strong> {{ maintenance_record.equipment.code }}</p>
     <p><strong>Tipo:</strong> {{ maintenance_record.get_maintenance_type_display }}</p>
     <p><strong>Descripción:</strong> {{ maintenance_record.description }}</p>
+    {% if maintenance_record.meter_reading is not None %}
+      <p><strong>Lectura:</strong> {{ maintenance_record.meter_reading }} {{ maintenance_record.equipment.measurement_unit_label|lower }}</p>
+    {% endif %}
     <p><strong>Estado:</strong> {{ maintenance_record.get_status_display }}</p>
     <p><strong>Realizado por:</strong> {{ maintenance_record.performed_by.username }}</p>
     <p><strong>Fecha de realización:</strong> {{ maintenance_record.performed_at|date:"d/m/Y H:i" }}</p>

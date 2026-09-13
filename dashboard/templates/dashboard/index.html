@@ -5,6 +5,18 @@
 {% block content %}
 <main>
   <h1>Inicio</h1>
+  <section class="search-panel">
+    <h2>Buscar información</h2>
+    <form class="universal-search" method="get" action="{% url 'dashboard:search' %}">
+      <label for="dashboard-search">Ingrese RUT, patente, VIN, chasis, motor, código, serie, nombre o ubicación</label>
+      <div class="search-controls"><input id="dashboard-search" type="search" name="q" placeholder="Ej.: 12.345.678-5, ABCD12 o VIN"><button type="submit">Buscar</button></div>
+    </form>
+  </section>
+  <section>
+    <h2>Pendientes de mantenimiento</h2>
+    <p><a href="{% url 'maintenance:pending' %}">Trabajos abiertos ({{ open_maintenance_count }})</a></p>
+    <p><a href="{% url 'maintenance:pending' %}?category=due">Mantenimientos vencidos ({{ due_maintenance_count }})</a></p>
+  </section>
 
   <section>
     <h2>Equipos</h2>

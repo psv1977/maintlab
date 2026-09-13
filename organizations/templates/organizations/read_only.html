@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Cuenta en solo lectura | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Cuenta en solo lectura</h1>
+    <p>El período demo o la suscripción de <strong>{{ organization.name }}</strong> ha vencido.</p>
+    <p>Puedes seguir consultando tus equipos, mantenimientos e historial, pero no crear ni modificar información.</p>
+    <p>Renueva la suscripción para recuperar todas las funciones.</p>
+  </main>
+{% endblock %}

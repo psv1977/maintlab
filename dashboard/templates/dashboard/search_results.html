@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Búsqueda universal | MaintLab{% endblock %}
+
+{% block content %}
+<main>
+  <h1>Búsqueda universal</h1>
+  <form class="universal-search" method="get">
+    <label for="search">RUT, nombre, código, patente, VIN, chasis, motor, serie, marca, modelo o ubicación</label>
+    <div class="search-controls"><input id="search" type="search" name="q" value="{{ query }}" autofocus><button type="submit">Buscar</button></div>
+  </form>
+  {% if query %}
+    <p>Resultados para <strong>{{ query }}</strong>.</p>
+    {% if customers %}
+      <section>
+        <h2>Clientes o propietarios</h2>
+        <ul class="result-list">
+          {% for customer in customers %}
+            <li><strong>{{ customer.name }}</strong> · {{ customer.rut }} · {{ customer.get_customer_type_display }} · {{ customer.equipments.count }} equipo{{ customer.equipments.count|pluralize }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+    <section>
+      <h2>Equipos ({{ equipments|length }})</h2>
+      {% if equipments %}
+        <ul class="result-list">
+          {% for equipment in equipments %}
+            <li>
+              <strong>{{ equipment.name }}</strong> · {{ equipment.code }} · {{ equipment.get_status_display }} · {{ equipment.location|default:"Sin ubicación" }}
+              {% if equipment.customer %} · {{ equipment.customer.name }} ({{ equipment.customer.rut }}){% endif %}
+              <div class="action-group"><a class="button button-secondary" href="{% url 'equipment:detail' equipment.pk %}">Ver equipo</a><a class="button button-secondary" href="{% url 'maintenance:history' equipment.pk %}">Historial</a><a class="button button-secondary" href="{% url 'maintenance:equipment-pending' equipment.pk %}">Pendientes</a></div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No se encontraron equipos que coincidan.</p>
+      {% endif %}
+    </section>
+  {% else %}
+    <p>Ingrese un dato para buscar.</p>
+  {% endif %}
+</main>
+{% endblock %}

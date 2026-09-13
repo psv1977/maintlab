@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from equipment.models import Equipment
-from maintenance.models import MaintenanceRecord
+from maintenance.models import MaintenancePlan, MaintenanceRecord
 
 
 @pytest.fixture
@@ -127,3 +127,44 @@ def test_create_view_ignores_submitted_responsible_user(client, user, equipment)
 
     assert response.status_code == 302
     assert MaintenanceRecord.objects.get(description="Cambio de filtro").performed_by == user
+
+
+@pytest.mark.django_db
+def test_create_view_resets_only_selected_plan(client, user, equipment):
+    time_plan = MaintenancePlan.objects.create(
+        equipment=equipment,
+        name="Inspección semestral",
+        strategy=MaintenancePlan.Strategy.TIME,
+        interval_days=180,
+        created_by=user,
+    )
+    meter_plan = MaintenancePlan.objects.create(
+        equipment=equipment,
+        name="Servicio por uso",
+        strategy=MaintenancePlan.Strategy.METER,
+        interval_value="500.00",
+        created_by=user,
+        last_service_meter="1000.00",
+    )
+    client.force_login(user)
+    performed_at = timezone.now().replace(microsecond=0)
+    response = client.post(
+        reverse("maintenance:create"),
+        {
+            "equipment": equipment.pk,
+            "client_rut": "11.111.111-1",
+            "maintenance_type": "scheduled",
+            "description": "Inspección semestral",
+            "performed_at": performed_at.strftime("%Y-%m-%dT%H:%M"),
+            "status": "pending",
+            "reset_plans": [time_plan.pk],
+            "meter_reading": "1200.00",
+        },
+    )
+
+    assert response.status_code == 302
+    time_plan.refresh_from_db()
+    meter_plan.refresh_from_db()
+    assert time_plan.last_service_at is not None
+    assert time_plan.last_service_meter is None
+    assert meter_plan.last_service_meter == 1000

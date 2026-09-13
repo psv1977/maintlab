@@ -6,12 +6,30 @@
   <main>
     <h1>{{ equipment.name }}</h1>
     <dl>
-      <dt>Código</dt>
-      <dd>{{ equipment.code }}</dd>
-      <dt>Descripción</dt>
-      <dd>{{ equipment.description|default:"Sin descripción" }}</dd>
-      <dt>Número de serie</dt>
-      <dd>{{ equipment.serial_number|default:"Sin número de serie" }}</dd>
+       <dt>Código</dt>
+       <dd>{{ equipment.code }}</dd>
+       <dt>Cliente o propietario</dt>
+       <dd>{% if equipment.customer %}{{ equipment.customer.name }} ({{ equipment.customer.rut }}){% else %}Sin cliente asignado{% endif %}</dd>
+       <dt>Descripción</dt>
+       <dd>{{ equipment.description|default:"Sin descripción" }}</dd>
+       <dt>Tipo de equipo</dt>
+       <dd>{{ equipment.get_equipment_type_display }}</dd>
+       <dt>Unidad de medición</dt>
+       <dd>{{ equipment.measurement_unit_label }}</dd>
+       <dt>Última lectura</dt>
+       <dd>{% if latest_meter_reading %}{{ latest_meter_reading.value }}{% else %}Sin lecturas{% endif %}</dd>
+       <dt>Planes activos</dt>
+       <dd>
+         {% for plan in maintenance_plans %}
+           {{ plan.name }} ({{ plan.get_strategy_display }}){% if not forloop.last %}, {% endif %}
+         {% empty %}
+           Sin planes
+         {% endfor %}
+       </dd>
+       <dt>Número de serie</dt>
+       <dd>{{ equipment.serial_number|default:"Sin número de serie" }}</dd>
+       <dt>Identificadores</dt>
+       <dd>{% for identifier in identifiers %}{{ identifier.get_identifier_type_display }}: {{ identifier.value }}{% if not forloop.last %}, {% endif %}{% empty %}Sin identificadores adicionales{% endfor %}</dd>
       <dt>Marca</dt>
       <dd>{{ equipment.brand|default:"Sin marca" }}</dd>
       <dt>Modelo</dt>
@@ -35,14 +53,21 @@
         <dd>{{ equipment.updated_at }}</dd>
       {% endif %}
     </dl>
-    <a href="{% url 'equipment:update' equipment.pk %}">Editar</a>
-    <a href="{% url 'maintenance:history' equipment.pk %}">Historial de mantenimiento</a>
+     <div class="action-group">
+       <a class="button" href="{% url 'equipment:update' equipment.pk %}">Editar</a>
+       <a class="button button-secondary" href="{% url 'equipment:reading-create' equipment.pk %}">Registrar {{ equipment.measurement_unit_label|lower }}</a>
+       <a class="button button-secondary" href="{% url 'equipment:identifier-create' equipment.pk %}">Agregar identificador</a>
+       <a class="button button-secondary" href="{% url 'maintenance:plan-create' %}">Crear plan de mantenimiento</a>
+       <a class="button button-secondary" href="{% url 'maintenance:history' equipment.pk %}">Historial de mantenimiento</a>
+       <a class="button button-secondary" href="{% url 'maintenance:equipment-pending' equipment.pk %}">Trabajos abiertos</a>
+       <a class="button button-secondary" href="{% url 'maintenance:equipment-pending' equipment.pk %}?category=due">Mantenimientos vencidos</a>
     {% if perms.deliveries.add_delivery %}
-      <a href="{% url 'deliveries:create' %}">Registrar entrega</a>
+       <a class="button button-secondary" href="{% url 'deliveries:create' %}">Registrar entrega</a>
     {% endif %}
     {% if perms.equipment.retire_equipment %}
-      <a href="{% url 'equipment:retire' equipment.pk %}">Retirar</a>
+       <a class="button button-danger" href="{% url 'equipment:retire' equipment.pk %}">Retirar</a>
     {% endif %}
-    <a href="{% url 'equipment:list' %}">Volver al listado</a>
+       <a class="button button-secondary" href="{% url 'equipment:list' %}">Volver al listado</a>
+     </div>
   </main>
 {% endblock %}

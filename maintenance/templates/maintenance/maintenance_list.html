@@ -5,6 +5,7 @@
 {% block content %}
   <main>
     <h1>Mantenimientos</h1>
+    <p><a href="{% url 'maintenance:pending' %}">Trabajos abiertos</a> · <a href="{% url 'maintenance:pending' %}?category=due">Mantenimientos vencidos</a></p>
     <p><a href="{% url 'maintenance:create' %}">Nuevo mantenimiento</a></p>
     <form method="get">
       <label for="search">Buscar</label>

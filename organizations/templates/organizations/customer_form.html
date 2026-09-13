@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo cliente | MaintLab{% endblock %}
+
+{% block content %}
+<main>
+  <h1>Nuevo cliente o propietario</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="action-group"><button type="submit">Guardar cliente</button><a class="button button-secondary" href="{% url 'equipment:create' %}">Cancelar</a></div>
+  </form>
+</main>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo plan de mantenimiento | MaintLab{% endblock %}
+
+{% block content %}
+  <main>
+    <h1>Nuevo plan de mantenimiento</h1>
+    <p>Un plan usa una sola estrategia: tiempo o horómetro/kilometraje.</p>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Guardar plan</button>
+      <a href="{% url 'maintenance:list' %}">Cancelar</a>
+    </form>
+  </main>
+{% endblock %}

@@ -14,6 +14,13 @@
       <a class="brand" href="{% url 'dashboard:index' %}">MaintLab</a>
       <a href="{% url 'equipment:list' %}">Equipos</a>
       <a href="{% url 'maintenance:list' %}">Mantenimientos</a>
+      {% if user.is_authenticated %}
+        <form class="header-search" method="get" action="{% url 'dashboard:search' %}">
+          <label class="visually-hidden" for="global-search">Búsqueda universal</label>
+          <input id="global-search" type="search" name="q" placeholder="Buscar RUT, patente, VIN...">
+          <button type="submit">Buscar</button>
+        </form>
+      {% endif %}
       <a href="{% url 'deliveries:list' %}">Entregas</a>
       {% if user.is_staff %}
         <a href="{% url 'users:list' %}">Usuarios</a>

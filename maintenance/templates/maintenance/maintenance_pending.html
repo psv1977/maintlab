@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Pendientes de mantenimiento | MaintLab{% endblock %}
+
+{% block content %}
+<main>
+  <h1>Pendientes de mantenimiento{% if equipment %}: {{ equipment.name }}{% endif %}</h1>
+  {% if equipment %}
+    <p>Código: {{ equipment.code }} · Ubicación: {{ equipment.location|default:"Sin ubicación" }}</p>
+    <p><a href="{% url 'equipment:detail' equipment.pk %}">Ver equipo</a> · <a href="{% url 'maintenance:history' equipment.pk %}">Historial</a></p>
+  {% endif %}
+  <nav aria-label="Categorías de pendientes">
+    <a href="?category=open&amp;q={{ query|urlencode }}"{% if category == "open" %} aria-current="page"{% endif %}>Trabajos abiertos ({{ open_count }})</a>
+    <a href="?category=due&amp;q={{ query|urlencode }}"{% if category == "due" %} aria-current="page"{% endif %}>Mantenimientos vencidos ({{ due_count }})</a>
+  </nav>
+  <p>Los trabajos abiertos están pendientes o en curso. Los vencidos son planes activos que alcanzaron su fecha o su lectura límite; un mismo equipo puede aparecer en ambas categorías.</p>
+  <form method="get">
+    <input type="hidden" name="category" value="{{ category }}">
+    <label for="search">Buscar por equipo, código, serie o ubicación{% if category == "open" %}, descripción, OT o RUT del cliente{% else %} o nombre del plan{% endif %}</label>
+    <input id="search" type="search" name="q" value="{{ query }}">
+    <button type="submit">Buscar</button>
+  </form>
+  {% if category == "due" %}
+    <h2>Mantenimientos vencidos</h2>
+    <p>Para horómetro y kilometraje se usa la última lectura registrada hasta ahora. Sin lectura o sin valor base no se puede determinar el vencimiento.</p>
+  {% else %}
+    <h2>Trabajos abiertos</h2>
+  {% endif %}
+  <ul>
+    {% for item in results %}
+      <li>
+        <a href="{% url 'equipment:detail' item.equipment.pk %}">{{ item.equipment.name }}</a>
+        · {{ item.equipment.code }} · {{ item.equipment.location|default:"Sin ubicación" }}
+        {% if category == "due" %}
+          · {{ item.name }}
+          {% if item.strategy == "time" %}
+            · Vencimiento: {{ item.due_at|date:"d/m/Y H:i" }}
+          {% else %}
+            · {{ item.equipment.measurement_unit_label }}: {{ item.latest_meter_value }} / límite {{ item.due_meter }}
+          {% endif %}
+        {% else %}
+          · <a href="{% url 'maintenance:detail' item.pk %}">{{ item.work_order.number|default:"Sin OT" }} — {{ item.description }}</a>
+          · {{ item.get_status_display }}
+        {% endif %}
+        · <a href="{% url 'maintenance:history' item.equipment.pk %}">Historial</a>
+      </li>
+    {% empty %}
+      <li>{% if category == "due" %}No hay planes vencidos para esta consulta.{% else %}No hay trabajos abiertos para esta consulta.{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% if is_paginated %}
+    <nav aria-label="Paginación">
+      {% if page_obj.has_previous %}<a href="?{{ query_params }}&amp;page={{ page_obj.previous_page_number }}">Anterior</a>{% endif %}
+      <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?{{ query_params }}&amp;page={{ page_obj.next_page_number }}">Siguiente</a>{% endif %}
+    </nav>
+  {% endif %}
+</main>
+{% endblock %}

@@ -5,7 +5,7 @@
 {% block content %}
   <main>
     <h1>Importar equipos</h1>
-    <p>Solo se aceptan archivos .xlsx. Las columnas obligatorias son <code>name</code> y <code>code</code>; las opcionales son <code>description</code>, <code>serial_number</code>, <code>brand</code>, <code>model</code>, <code>location</code> y <code>application</code>.</p>
+    <p>Se aceptan archivos <code>.csv</code> y <code>.xlsx</code>. Las columnas obligatorias son <code>name</code> y <code>code</code>; las opcionales son <code>equipment_type</code>, <code>description</code>, <code>serial_number</code>, <code>brand</code>, <code>model</code>, <code>location</code>, <code>commissioned_at</code>, <code>application</code> y <code>status</code>.</p>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       {{ form.as_p }}

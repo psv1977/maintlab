@@ -117,10 +117,11 @@ class EquipmentIdentifierForm(forms.ModelForm):
 
 
 class EquipmentImportForm(forms.Form):
-    file = forms.FileField(label="Planilla Excel")
+    file = forms.FileField(label="Planilla de equipos")
 
     def clean_file(self):
         uploaded_file = self.cleaned_data["file"]
-        if not uploaded_file.name.lower().endswith(".xlsx"):
-            raise forms.ValidationError("Seleccione un archivo Excel con extensión .xlsx.")
+        name = uploaded_file.name.lower()
+        if not (name.endswith(".xlsx") or name.endswith(".csv")):
+            raise forms.ValidationError("Seleccione un archivo .csv o .xlsx.")
         return uploaded_file

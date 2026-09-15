@@ -1,0 +1,51 @@
+name,code,equipment_type,description,serial_number,brand,model,location,commissioned_at,application,status
+Torno CNC #1,TOR-001,industrial,Torno de control numérico para mecanizado de precisión,SN-2021-001,DMG Mori,CLX 350,Planta A,2021-03-15,Mecanizado de piezas,operational
+Torno CNC #2,TOR-002,industrial,Torno CNC de eje dual,SN-2021-002,Okuma,LT-2000,Planta A,2021-06-20,Mecanizado de ejes,operational
+Fresadora Universal,FRE-001,industrial,Fresadora de bancada universal,SN-2020-003,Bridgeport,Series II,Planta B,2020-01-10,Fresado de planos,operational
+Prensa Hidráulica,PRE-001,industrial,Prensa hidráulica de 200 toneladas,SN-2019-004,Hydromec,HP-200,Planta A,2019-08-05,Stampado de chapa,operational
+Soldadora MIG,SOL-001,industrial,Soldadora MIG/MAG multiproceso,SN-2022-005,Miller,Millermatic 255,Taller 1,2022-02-14,Soldadura estructural,operational
+Soldadora TIG,SOL-002,industrial,Soldadora TIG para aluminio,SN-2022-006,ESAB,Warrior 500i,Taller 1,2022-05-10,Soldadura de aluminio,operational
+Compresor de Aire,COM-001,industrial,Compresor tornillo de 50HP,SN-2020-007,Atlas Copco,GX 50,Planta A,2020-04-22,Suministro de aire comprimido,operational
+Generador Eléctrico,GEN-001,industrial,Generador diésel de 100kVA,SN-2018-008,Caterpillar,DE100,Planta B,2018-11-30,Energía de respaldo,operational
+Grúa Puente,GPU-001,industrial,Grúa puente de 5 toneladas,SN-2017-009,Konecranes,CXT,Planta A,2017-09-15,Movimiento de cargas,operational
+Elevador Hidráulico,ELEV-001,industrial,Elevador hidráulico de 3 toneladas,SN-2021-010,Rotary,Lift-3000,Taller 2,2021-01-20,Elevación de vehículos,operational
+Horno Industrial,HOR-001,industrial,Horno de tratamientos térmicos,SN-2019-011,Carbolite,Gero 3000,Planta B,2019-03-08,Tratamientos térmicos,operational
+Máquina de Corte Plasma,COR-001,industrial,Corte por plasma de alta definición,SN-2020-012,Hypertherm,Powermax 105,Taller 1,2020-07-14,Corte de chapa,operational
+Línea de Ensamblaje,ENS-001,industrial,Línea de ensamblaje automatizada,SN-2016-013,Fanuc,LR Mate,Planta A,2016-05-20,Ensamblaje de componentes,operational
+Rayos X Industrial,RAY-001,industrial,Equipo de radiografía industrial,SN-2021-014,GE,Phoenix 225,Planta B,2021-08-01,Inspección no destructiva,operational
+Medidor de Dureza,MED-001,industrial,Durómetro portátil Rockwell,SN-2022-015,Innovatest,M reputación,Lab Calidad,2022-01-10,Control de calidad,operational
+Camión Toyota,CAM-001,automotive,Camión de carga 3.5 toneladas,SN-2020-016,Toyota,Hilux,Flota,2020-02-01,Transporte de materiales,operational
+Camión Chevrolet,CAM-002,automotive,Camión de carga 5 toneladas,SN-2019-017,Chevrolet,NPR,Flota,2019-06-15,Transporte de producto terminado,operational
+Excavadora,EXC-001,automotive,Excavadora hidráulica 20 toneladas,SN-2018-018,Caterpillar,320F,Externo,2018-04-10,Trabajos de tierra,operational
+Bulldozer,BUL-001,automotive,Bulldozer D6 con hoja frontal,SN-2019-019,Caterpillar,D6T,Externo,2019-02-28,Nivelación de terreno,operational
+Retroexcavadora,RET-001,automotive,Retroexcavadora multifunción,SN-2020-020,JCB,3CX,Externo,2020-05-18,Excavación y carga,operational
+Montacargas,MON-001,automotive,Montacargas eléctrico 2.5 toneladas,SN-2021-021,Toyota,8FBE25,Almacén,2021-04-05,Movimiento de pallets,operational
+Horquilla Eléctrica,HOR-002,automotive,Horquilla eléctrica 3 toneladas,SN-2020-022,Still,EXV-S 30,Almacén,2020-09-12,Alimentación de línea,operational
+Bobcat,BOB-001,automotive,Cargadora compacta S650,SN-2022-023,Bobcat,S650,Externo,2022-03-01,Carga de materiales,operational
+Motoconchuela,MOT-001,automotive,Motoconchuela de carga 1.5 toneladas,SN-2021-024,Yale,GLP16,Planta A,2021-07-20,Transporte interno,operational
+Carro de Compras #1,CC-001,automotive,Carro de compras industrial,SN-2023-025,Lion,Classic,Externo,2023-01-05,Distribución,operational
+Carro de Compras #2,CC-002,automotive,Carro de compras reforzado,SN-2023-026,Lion,Reforzado Pro,Externo,2023-02-10,Distribución pesada,operational
+Carro de Compras #3,CC-003,automotive,Carro de compras plegable,SN-2023-027,Lion,Fold,Externo,2023-03-15,Distribución,operational
+Guía Automatizada,AGV-001,industrial,Vehículo guiado automático,SN-2022-028,MiR,MIR250,Planta A,2022-06-01,Transporte autónomo,operational
+Banda Transportadora,BAN-001,industrial,Banda transportadora de 10 metros,SN-2020-029,Hytrol,EZLogic,Planta B,2020-08-20,Movimiento de materiales,operational
+Sistema de Ventilación,SIS-001,industrial,Sistema de extracción industrial,SN-2019-030,Dräger,Industrial 3000,Planta A,2019-11-05,Ventilación y aire acondicionado,operational
+Caldera Industrial,CAL-001,industrial,Caldera de vapor de 500kW,SN-2018-031,Viessmann,EcoVit,Planta B,2018-02-14,Suministro de vapor,operational
+Refrigerador Industrial,REF-001,industrial,Cámara frigorífica -20°C,SN-2021-032,Carrier,61N,Almacén,2021-09-01,Conservación de productos,operational
+Pulidora Industrial,PUL-001,industrial,Pulidora de banda 750mm,SN-2020-033,Timesaver,TS 350,Taller 1,2020-03-10,Acabado de superficies,operational
+Taladro de Torno,TAL-001,industrial,Taladro de pedestal industrial,SN-2019-034,Powermatic,PM2800,Taller 2,2019-07-22,Taladrado de precisión,operational
+Sierra Cinta,SIE-001,industrial,Sierra de cinta vertical,SN-2020-035,DoAll,2013-DE,Taller 1,2020-01-05,Corte de metales,operational
+Cizalla Hidráulica,CIZ-001,industrial,Cizalla de guillotine 4 metros,SN-2018-036,Accurpress,725040,Planta A,2018-06-30,Corte de chapa,operational
+Dobladora de Choca,DOB-001,industrial,Dobladora CNC de 3 ejes,SN-2019-037,Amada,HG-1303,Planta B,2019-04-18,Doblado de chapa,operational
+Autoclave,AUT-001,industrial,Autoclave para esterilización,SN-2021-038,Getinge,E-series,Lab Calidad,2021-02-28,Esterilización,operational
+Cámara de Cribado,CRI-001,industrial,Cámara de pruebas ambientales,SN-2020-039,Weiss Technik,WKL 1000,Lab Calidad,2020-10-15,Pruebas de confiabilidad,operational
+Línea de Pintura,LIN-001,industrial,Línea de pintura electrostática,SN-2017-040,ITW,Garmatic,Planta A,2017-08-12,Pintura de componentes,operational
+Robot Soldador,ROB-001,industrial,Robot de soldadura 6 ejes,SN-2021-041,Fanuc,R-2000iC,Taller 1,2021-05-10,Soldadura automatizada,operational
+Torre de Enfriamiento,TOR-010,industrial,Torre de enfriamiento de 200 toneladas,SN-2019-042,Baltimore,Airflow,Planta B,2019-01-25,Refrigeración de proceso,operational
+Desecador,DES-001,industrial,Desecador por adsorción,SN-2022-043,Parker,Hiross,Planta A,2022-04-01,Secado de aire comprimido,operational
+Filtración Industrial,FIL-001,industrial,Sistema de filtración de aceite,SN-2020-044,Pall,Ultipleat,Taller 2,2020-06-10,Filtración de lubricantes,operational
+Sopladora Industrial,SOP-001,industrial,Sopladora de tornillo 30HP,SN-2021-045,Atlas Copco,ZT 37,Planta A,2021-10-05,Soplado y secado,operational
+Moto Honda,MOT-002,automotive,Moto de reparto 150cc,SN-2022-046,Honda,CG 150,Flota,2022-01-20,Distribución urbana,operational
+Auto de Servicio,AUT-002,automotive,Auto sedan de servicio,SN-2021-047,Toyota,Corolla,Flota,2021-03-01,Servicio administrativo,operational
+Camioneta de Servicio,CAM-003,automotive,Camioneta doble cabina 4x4,SN-2020-048,Toyota,Hilux SRV,Flota,2020-11-15,Visitas a clientes,operational
+Motonieve,MOT-003,automotive,Motonieve para limpieza de vías,SN-2019-049,John Deere,110,Externo,2019-12-01,Limpieza de acceso,in_maintenance
+Barcaza,BAR-001,automotive,Barcaza de carga fluvial,SN-2018-050,Astivik,River 1200,Externo,2018-07-20,Transporte fluvial,out_of_service

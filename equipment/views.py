@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Q
@@ -211,11 +213,16 @@ class EquipmentImportView(LoginRequiredMixin, UserPassesTestMixin, View):
         if not form.is_valid():
             return render(request, self.template_name, {"form": form})
 
-        from openpyxl import load_workbook
+        uploaded_file = form.cleaned_data["file"]
+        try:
+            if uploaded_file.name.lower().endswith(".csv"):
+                headers, data_rows = self._parse_csv(uploaded_file)
+            else:
+                headers, data_rows = self._parse_xlsx(uploaded_file)
+        except (UnicodeDecodeError, ValueError):
+            form.add_error("file", "No fue posible leer el archivo seleccionado.")
+            return render(request, self.template_name, {"form": form})
 
-        workbook = load_workbook(form.cleaned_data["file"], read_only=True, data_only=True)
-        worksheet = workbook.active
-        headers = [str(value).strip().lower() if value is not None else "" for value in next(worksheet.iter_rows(values_only=True), ())]
         required_headers = ["name", "code"]
         if any(header not in headers for header in required_headers):
             form.add_error("file", "La planilla debe incluir las columnas name y code.")
@@ -225,8 +232,8 @@ class EquipmentImportView(LoginRequiredMixin, UserPassesTestMixin, View):
         rows = []
         errors = []
         seen_codes = set()
-        for row_number, values in enumerate(worksheet.iter_rows(min_row=2, values_only=True), start=2):
-            if not any(value is not None for value in values):
+        for row_number, values in enumerate(data_rows, start=2):
+            if not any(v is not None and str(v).strip() for v in values):
                 continue
             data = dict(zip(headers, values))
             name = str(data.get("name") or "").strip()
@@ -236,11 +243,19 @@ class EquipmentImportView(LoginRequiredMixin, UserPassesTestMixin, View):
             elif code in seen_codes or Equipment.objects.filter(organization=organization, code=code).exists():
                 errors.append(f"Fila {row_number}: el código {code} ya existe.")
             else:
+                try:
+                    data["commissioned_at"] = self._parse_date(data.get("commissioned_at"))
+                except ValueError:
+                    errors.append(f"Fila {row_number}: commissioned_at debe usar el formato YYYY-MM-DD.")
+                    continue
                 seen_codes.add(code)
                 rows.append(data)
 
         if errors:
             return render(request, self.template_name, {"form": form, "errors": errors})
+
+        valid_types = {value for value, _ in Equipment.EquipmentType.choices}
+        valid_statuses = {value for value, _ in Equipment.Status.choices}
 
         with transaction.atomic():
             for data in rows:
@@ -248,16 +263,60 @@ class EquipmentImportView(LoginRequiredMixin, UserPassesTestMixin, View):
                 location = None
                 if location_name:
                     location, _ = Location.objects.get_or_create(organization=organization, name=location_name)
+
+                equipment_type = str(data.get("equipment_type") or "").strip().lower()
+                if equipment_type not in valid_types:
+                    equipment_type = Equipment.EquipmentType.INDUSTRIAL
+
+                status = str(data.get("status") or "").strip().lower()
+                if status not in valid_statuses:
+                    status = Equipment.Status.OPERATIONAL
+
                 Equipment.objects.create(
                     organization=organization,
                     name=str(data["name"]).strip(),
                     code=str(data["code"]).strip(),
+                    equipment_type=equipment_type,
                     description=str(data.get("description") or "").strip(),
                     serial_number=str(data.get("serial_number") or "").strip(),
                     brand=str(data.get("brand") or "").strip(),
                     model=str(data.get("model") or "").strip(),
                     location=location,
+                    commissioned_at=data["commissioned_at"],
                     application=str(data.get("application") or "").strip(),
+                    status=status,
                     created_by=request.user,
                 )
         return render(request, self.template_name, {"form": EquipmentImportForm(), "imported_count": len(rows)})
+
+    def _parse_csv(self, uploaded_file):
+        import csv
+        import io
+
+        text = uploaded_file.read().decode("utf-8-sig")
+        reader = csv.reader(io.StringIO(text))
+        rows = list(reader)
+        if not rows:
+            return [], []
+        headers = [h.strip().lower() for h in rows[0]]
+        return headers, rows[1:]
+
+    def _parse_xlsx(self, uploaded_file):
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(uploaded_file, read_only=True, data_only=True)
+        worksheet = workbook.active
+        all_rows = list(worksheet.iter_rows(values_only=True))
+        if not all_rows:
+            return [], []
+        headers = [str(v).strip().lower() if v is not None else "" for v in all_rows[0]]
+        return headers, all_rows[1:]
+
+    def _parse_date(self, value):
+        if value in (None, ""):
+            return None
+        if isinstance(value, datetime):
+            return value.date()
+        if isinstance(value, date):
+            return value
+        return datetime.strptime(str(value).strip(), "%Y-%m-%d").date()

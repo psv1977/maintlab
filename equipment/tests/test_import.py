@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from io import BytesIO
+from pathlib import Path
 
 import pytest
 from django.contrib.auth.models import User
@@ -33,6 +34,23 @@ def test_import_csv_creates_equipment_with_optional_fields(client, staff_user):
     assert equipment.location.name == "Flota"
     assert equipment.commissioned_at == date(2024, 5, 10)
     assert equipment.status == Equipment.Status.IN_MAINTENANCE
+
+
+@pytest.mark.django_db
+def test_import_sample_csv_fixture(client, staff_user):
+    client.force_login(staff_user)
+    fixture_path = Path(__file__).resolve().parents[1] / "fixtures" / "equipment_sample.csv"
+    uploaded_file = SimpleUploadedFile(
+        fixture_path.name,
+        fixture_path.read_bytes(),
+        content_type="text/csv",
+    )
+
+    response = client.post(reverse("equipment:import"), {"file": uploaded_file})
+
+    assert response.status_code == 200
+    assert response.context["imported_count"] == 50
+    assert Equipment.objects.count() == 50
 
 
 @pytest.mark.django_db

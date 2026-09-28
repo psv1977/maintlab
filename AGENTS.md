@@ -1,6 +1,9 @@
 # Propósito y alcance
-- MVP: registrar equipos, registrar mantenimientos, consultar el historial y gestionar usuarios.
+- El MVP existente incluye gestión de equipos, mantenimientos e historial, organizaciones y aislamiento multi-tenant, gestión de usuarios, entregas, dashboard y búsqueda universal.
+- Las apps existentes son `equipment`, `maintenance`, `organizations`, `users`, `deliveries` y `dashboard`. Mantener sus dependencias desacopladas y respetar el aislamiento por organización en modelos, vistas, formularios, consultas y pruebas.
+- CSV de equipos es una extensión posterior de `001-equipment`, no una app ni una feature independiente. La búsqueda universal se documenta en `006-dashboard-search`; no duplicar esa especificación en `001-equipment`.
 - Materiales e inventario son post-MVP: mantener el diseño extensible, pero no implementar esas funciones ni crear sus apps aún.
+- El estado funcional y su trazabilidad SDD se documentan en `spec/features/001-equipment/` y `spec/features/002-maintenance/` a `spec/features/006-dashboard-search/`. Las especificaciones 002–006 son retroactivas y describen funcionalidad existente.
 
 # Stack y restricciones
 - Backend: Python/Django con SQLite inicialmente y configuración en `maintlab/settings.py`. No cambiar de base de datos ni instalar dependencias sin autorización.

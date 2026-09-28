@@ -349,5 +349,56 @@ Verificación base de cada tarea (desde la raíz del proyecto):
      documentado).
   6. `git status`: `db.sqlite3`, `db.sqlite3-journal`, `.env` y
      `.venv/` fuera del repositorio.
-  7. Revisión de historial: commits en español, identificadores en
-     inglés, un commit lógico por tarea.
+   7. Revisión de historial: commits en español, identificadores en
+      inglés, un commit lógico por tarea.
+
+### Registro de resultados y cierre de T19
+
+**Estado:** completada. La gestión de equipos definida en `spec.md` quedó
+implementada y su verificación integral fue incorporada en el commit
+`78e2f6b` (`test: añade smoke test de los 4 flujos funcionales de equipos`).
+T18 se implementó en `bfa1127`; el desarrollo incremental T01–T18 se traza
+en los commits enumerados en el historial de esta feature, desde `915b8d0`
+hasta `bfa1127`.
+
+La cobertura de aceptación se encuentra en los siguientes tests existentes:
+
+| Área de aceptación | Tests existentes |
+|---|---|
+| Modelo, catálogo de estados, valores y auditoría | `equipment/tests/test_models.py` |
+| Validación de formulario y código único | `equipment/tests/test_forms.py` |
+| Listado, detalle, autenticación y paginación | `equipment/tests/test_views_list.py` |
+| Búsqueda del listado y filtro por estado | `equipment/tests/test_views_search.py` |
+| Alta y auditoría de creación | `equipment/tests/test_views_create.py` |
+| Edición, unicidad y estados permitidos | `equipment/tests/test_views_update.py` |
+| Retiro autorizado y conservación | `equipment/tests/test_views_retire.py` |
+| Grupo `tecnicos` y permisos | `equipment/tests/test_groups.py`, `equipment/tests/test_permissions.py` |
+| Bloqueo de eliminación física | `equipment/tests/test_deletion.py`, `equipment/tests/test_admin.py` |
+| Integración de los cuatro flujos principales | `equipment/tests/test_smoke_flows.py` |
+
+Verificación realizada durante esta regularización documental:
+
+- `python manage.py check`: correcto, sin incidencias.
+- `git diff --check`: correcto.
+- `pytest`: no pudo completar la recolección; falló al importar
+  `openpyxl` desde `equipment/tests/test_import.py` (`ModuleNotFoundError`).
+  No se instalaron dependencias. La suite completa queda pendiente de un
+  entorno con las dependencias de prueba instaladas.
+- `makemigrations --check --dry-run`: no ejecutado en esta regularización.
+
+Estas limitaciones quedan registradas y no se atribuye a `78e2f6b` una
+verificación que no conste en dicho commit.
+
+#### Extensiones posteriores al cierre original
+
+- **Importación CSV:** extensión de gestión de equipos añadida después del
+  alcance original. `a729811` incorpora la importación y sus pruebas;
+  `4678eb1` refuerza la validación y actualiza la documentación. Su cobertura
+  actual está en `equipment/tests/test_import.py`. No forma parte de los
+  criterios de aceptación originales de esta feature y no se gestiona como
+  feature independiente.
+- **Búsqueda universal:** la búsqueda de equipos y clientes es una integración
+  posterior trazada a `b0baafb` y `2442856`. Se especifica una sola vez en
+  [`006-dashboard-search`](../006-dashboard-search/spec.md); no amplía ni
+  duplica aquí los requisitos de búsqueda local de equipos definidos en esta
+  feature.
